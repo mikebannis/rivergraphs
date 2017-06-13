@@ -1,0 +1,22 @@
+gage_id,type,river,location
+# ---- Clear Creek
+06716500,USGS,Clear Creek,Dumont
+06719505,USGS,Clear Creek,Golden
+# --- Arkansas
+ARKGRNCO,DWR,Arkansas River,Granite
+07087050,USGS,Arkansas River,Numbers Putin
+07091200,USGS,Arkansas River,Browns/Nathrup
+07094500,USGS,Arkansas River,Parkdale
+# ---- Arkansas River Headwaters
+07083710,USGS,Arkansas Headwaters,Arkansas Near Malta
+CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir
+CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir
+LAKBTLCO,DWR,Arkansas Headwaters,Lake Creek Below Twin Lakes Reservoir
+# ---- Bailey 
+PLAGRACO,DWR,North Fork South Platte,Grant Gage
+ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel
+# ---- South Boulder Creek 
+BOCPINCO,DWR,South Boulder Creek,Above Gross Res - Alto Alto
+# --- Colorado River
+09058000,USGS,Colorado River,Kremmling - Gore
+09070500,USGS,Colorado River,Dotsero - Glenwood Canyon

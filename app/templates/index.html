@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Welcome to Rivers</title>
+  </head>
+  <body>
+    some stream graphs
+    {% for river, gages in rivers.items() %}
+    <h1> {{ river }} </h1>
+        {% for gage in gages %}
+            <div style="display: inline-block">
+                <h3> <a href="{{ gage.url() }}"> {{ gage.location }} </a></h3> 
+                <img src={{ url_for('static', filename=gage.image()) }}></div>
+        {% endfor %}
+    {% endfor %}
+
+	
+  </body>
+</html>
