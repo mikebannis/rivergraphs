@@ -78,12 +78,45 @@ def get_usgs_gage(gage, outfile=None):
     response = requests.get(img_addr, stream=True, cookies=response.cookies)
     with open(outfile, 'wb') as out:
         shutil.copyfileobj(response.raw, out)
+	
+    # Get the discharge
+    for tag in soup.find_all('a'):
+        if tag.get('name') == "gifno-99":
+            if tag.getText().strip() == 'Discharge, cubic feet per second':
+                parent = tag.parent
+                # Grab the graph and save it
+                img = parent.parent.find_next('img')
+                if img.get('alt') == "Graph of ":
+                    img_addr = img.get('src')
+                else:
+                    raise FailedImageAddr('image address not found for '+gage)
+                response = requests.get(img_addr, stream=True, cookies=response.cookies)
+                with open(outfile, 'wb') as out:
+                    shutil.copyfileobj(response.raw, out)
+                
+                # Grab the discharge and save it to a .cfs file
+                _next = parent.next_sibling
+                q = pull_val(_next)
+                q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
+                print (q_out)
+                with open(q_out, 'wt') as out:
+                    for val in q:
+                        out.write(str(val) + ',')
+            #if tag.getText().strip() == 'Gage height, feet':
+                #parent = tag.parent
+                #_next = parent.next_sibling
+                #stage =  pull_val(_next)
 
+def pull_val(text):
+    fields = text.split()
+    for i in range(len(fields)):
+        if fields[i] == 'value:':
+            return (fields[i+1], fields[i+2], fields[i+3])
 def main():
     gages = gageman.get_gages()
     for gage in gages:
         if gage.gage_type == 'USGS':
-            print ('working on USGS gage:' + str(gage))
+            print ('*** working on USGS gage:' + str(gage))
             outfile = OUTPATH + gage.image()
             try:
                 get_usgs_gage(gage.gage_id, outfile)
