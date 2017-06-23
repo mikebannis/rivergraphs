@@ -38,6 +38,16 @@ def get_dwr_graph(gage, outfile=None):
         if id == 'ctl00_ContentPlaceHolder1_ctl00':
             img_addr = 'http://www.dwr.state.co.us' + img.get('src')
 
+    # Grab the most recent discharge
+    for texts in soup.findAll(text=True):
+        if 'cfs' in texts:
+            vals = texts.strip().split()
+            vals.pop(1)  # Ditch the 'cfs' text
+            q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
+            print (q_out)
+            with open(q_out, 'wt') as out:
+                out.write(','.join(vals))
+
     # Get and save the image
     response = requests.get(img_addr, stream=True, cookies=response.cookies)
     with open(outfile, 'wb') as out:
@@ -62,22 +72,24 @@ def get_usgs_gage(gage, outfile=None):
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
     
-    # Grab the image url
-    img_addr = None
+#    # Grab the image url
+#    img_addr = None
+#    soup = BeautifulSoup(response.text, 'html.parser')
+#    for img in soup.find_all('img'):
+#        #print(img, img.get('alt'))
+#
+#        if img.get('alt') == "Graph of ":
+#            img_addr =  img.get('src')
+#            break
+#    if img_addr is None:
+#        raise FailedImageAddr('image address not found for '+gage)
+#
+#    # Grab and save the image
+#    response = requests.get(img_addr, stream=True, cookies=response.cookies)
+#    with open(outfile, 'wb') as out:
+#        shutil.copyfileobj(response.raw, out)
+    
     soup = BeautifulSoup(response.text, 'html.parser')
-    for img in soup.find_all('img'):
-        #print(img, img.get('alt'))
-
-        if img.get('alt') == "Graph of ":
-            img_addr =  img.get('src')
-            break
-    if img_addr is None:
-        raise FailedImageAddr('image address not found for '+gage)
-
-    # Grab and save the image
-    response = requests.get(img_addr, stream=True, cookies=response.cookies)
-    with open(outfile, 'wb') as out:
-        shutil.copyfileobj(response.raw, out)
 	
     # Get the discharge
     for tag in soup.find_all('a'):

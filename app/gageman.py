@@ -16,7 +16,12 @@ class Gage(object):
         self.gage_type = gage_type # either 'USGS' or 'DWR' (string)
         self.river = river  # name of river/creek (string)
         self.location = location  # location of gage (string)
-        self.q = self._get_q()  # most recent discharge
+        
+        self.q = None  # most recent discharge
+        self.q_date = None  # date of most recent discharge
+        self.q_time = None  # tiem of most recent discharge
+        self._get_q()  # Get values for q, q_date, & q_time
+
         if gage_type != 'USGS' and gage_type != 'DWR':
             raise AttributeError('gage_type must be USGS or DWR, was passed ' + gage_type)
     
@@ -41,9 +46,9 @@ class Gage(object):
             with open(q_file, 'rt') as infile:
                 data = infile.readline()
             fields = data.strip().split(',')
-            return fields[0]  # First field is discharge
-        else:
-            return -999
+            self.q = fields[0]  # First field is discharge
+            self.q_date = fields[1] 
+            self.q_time = fields[2] 
 
     def __str__(self):
         return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' + self.location
