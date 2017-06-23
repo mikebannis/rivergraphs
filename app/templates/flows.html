@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Welcome to Rivers</title>
+    <style>
+    h3 {
+            display:inline
+    }
+    </style>
+  </head>
+  <body>
+    Colorado River Gages
+    {% for river, gages in rivers.items() %}
+    <h1> {{ river }} </h1>
+        {% for gage in gages %}
+            <div style="display: inline-block">
+                <h3> <a href="{{ gage.url() }}"> {{ gage.location }} </a>&emsp; {{ gage.q }} cfs </h3> at {{gage.q_time}} {{gage.q_date}}
+                <p><img src={{ url_for('static', filename=gage.image()) }}></div>
+        {% endfor %}
+    {% endfor %}
+
+	
+  </body>
+</html>
