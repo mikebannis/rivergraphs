@@ -3,3 +3,6 @@
 *.pyc
 *.cfs
 .*.swp
+log
+log/*
+rivergraphs.wsgi
