@@ -3,6 +3,7 @@
 *.pyc
 *.cfs
 .*.swp
-log
-log/*
+logs
+logs/*
 rivergraphs.wsgi
+app/gages.csv
