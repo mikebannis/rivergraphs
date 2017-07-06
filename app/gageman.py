@@ -10,12 +10,13 @@ class Gage(object):
     Information pertaining to a DWR or USGS gage, and methods returning graph image
     and URL to the actual gage
     """
-    def __init__(self, gage_id, gage_type, river, location):
+    def __init__(self, gage_id, gage_type, river, location, region):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks like 06716500, for dwr 
                                 # this is PLAGRACO
         self.gage_type = gage_type # either 'USGS' or 'DWR' (string)
         self.river = river  # name of river/creek (string)
         self.location = location  # location of gage (string)
+        self.region = region  # region the gage is located in (FR, Ark, Central, etc)
         
         self.q = None  # most recent discharge
         self.q_date = None  # date of most recent discharge
@@ -51,19 +52,24 @@ class Gage(object):
             self.q_time = fields[2] 
 
     def __str__(self):
-        return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' + self.location
+        return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' + self.location + \
+                ',' + self.region
 
 def get_gages(filename=GAGEFILE):
     gages = []
     with open(filename, 'rt') as infile:
         rdr = csv.DictReader(filter(lambda row: row[0]!='#', infile))
         for row in rdr:
-            temp_gage = Gage(row['gage_id'], row['type'], row['river'], row['location'])
+            temp_gage = Gage(row['gage_id'], row['type'], row['river'], row['location'], row['region'])
             gages.append(temp_gage)
     return gages
 
-def get_rivers(filename=GAGEFILE):
-    gages = get_gages(filename)
+def get_rivers(gages):
+    """
+    Organizes gages by river
+    :param gages: dict from get_gages()
+    :returns: dict of gages organized by river
+    """
     rivers = defaultdict(list)
     for gage in gages:
         rivers[gage.river].append(gage)

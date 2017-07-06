@@ -126,7 +126,7 @@ def pull_val(text):
             return (fields[i+1], fields[i+2], fields[i+3])
 def main():
     gages = gageman.get_gages()
-    for gage in gages:
+    for gage in gages[::-1]:
         if gage.gage_type == 'USGS':
             print ('*** working on USGS gage:' + str(gage))
             outfile = OUTPATH + gage.image()
