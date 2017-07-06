@@ -1,11 +1,7 @@
-<html>
-  <head>
-    <title>Colorado Snotel Graphs</title>
-  </head>
-  <body>
-    <a href="index.html">Home</a>
+{% extends "base.html" %}
+{% block content %}
     <a href=https://www.nrcs.usda.gov/wps/portal/nrcs/detail/co/snow/products/?cid=nrcs144p2_063323>NRCS Snotel for Colorado </a>
-    <h2> State Wide </h2>
+    <h2> Colorado State Wide </h2>
     <img src=https://www.wcc.nrcs.usda.gov/ftpref/data/water/wcs/basinsweplots/co/basinplotstate17.gif?>
     <h2> Arkansas River</h2>
     <img src=https://www.wcc.nrcs.usda.gov/ftpref/data/water/wcs/basinsweplots/co/basinplotark17.gif?>
@@ -17,3 +13,4 @@
     <img src=https://www.wcc.nrcs.usda.gov/ftpref/data/water/wcs/basinsweplots/co/basinplotsjadsm17.gif?>
   </body>
 </html>
+{% endblock %}

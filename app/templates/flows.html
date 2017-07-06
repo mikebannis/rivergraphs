@@ -1,13 +1,5 @@
-<html>
-  <head>
-    <title>Welcome to Rivers</title>
-    <style>
-    h3 {
-            display:inline
-    }
-    </style>
-  </head>
-  <body>
+{% extends "base.html" %}
+{% block content %}
     Colorado River Gages
     {% for river, gages in rivers.items() %}
     <h1> {{ river }} </h1>
@@ -17,7 +9,4 @@
                 <p><img src={{ url_for('static', filename=gage.image()) }}></div>
         {% endfor %}
     {% endfor %}
-
-	
-  </body>
-</html>
+{% endblock %}

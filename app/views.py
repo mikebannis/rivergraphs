@@ -6,16 +6,18 @@ sys.path.append(os.path.dirname(__file__))
 import gageman
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_template('index.html')
+#@app.route('/')
+#@app.route('/index')
+#def index():
+#    return render_template('index.html')
 
 @app.route('/snotel')
 def snotel():
     return render_template('snotel.html')
 
 @app.route('/flows')
+@app.route('/')
+@app.route('/index')
 def flows():
     rivers = gageman.get_rivers()
     return render_template('flows.html', rivers=rivers)
