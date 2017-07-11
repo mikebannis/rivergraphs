@@ -5,5 +5,4 @@
 .*.swp
 logs
 logs/*
-rivergraphs.wsgi
 app/gages.csv
