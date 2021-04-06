@@ -37,8 +37,9 @@ class Gage(object):
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         else:
-            return 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID=' + \
-                    self.gage_id + '&MTYPE=DISCHRG'
+            return 'https://dwr.state.co.us/Tools/Stations/' + self.gage_id
+            # return 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID=' + \
+             #       self.gage_id + '&MTYPE=DISCHRG'
 
     def _get_q(self):
         """ Pulls and returns most recent discharge from *.cfs file in static directory """

@@ -22,7 +22,7 @@ def get_dwr_graph(gage, outfile=None):
     prarm: outfile - name of file to export 
     """
     #TODO - check for .png at end of outfile
-    gage_url = 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID='+gage
+    gage_url = 'https://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID='+gage
     if outfile is None:
         outfile = gage+'.png'
     response = requests.get(gage_url)
@@ -32,11 +32,19 @@ def get_dwr_graph(gage, outfile=None):
         raise URLError(response.status_code, response.text)
 
     # Grab the image url
+    img_addr = None
     soup = BeautifulSoup(response.text, 'html.parser')
     for img in soup.find_all('img'):
-        id = img.get('id')
-        if id == 'ctl00_ContentPlaceHolder1_ctl00':
-            img_addr = 'http://www.dwr.state.co.us' + img.get('src')
+        #print (img)
+        _id = img.get('id')
+        #print (_id)
+        #"ContentPlaceHolder1_ctl00"
+        if _id == 'ContentPlaceHolder1_ctl00':
+            img_addr = 'https://www.dwr.state.co.us' + img.get('src')
+
+    if img_addr is None:
+        print ('Unable to get image for gage', gage)
+        return
 
     # Grab the most recent discharge
     for texts in soup.findAll(text=True):
@@ -44,7 +52,7 @@ def get_dwr_graph(gage, outfile=None):
             vals = texts.strip().split()
             vals.pop(1)  # Ditch the 'cfs' text
             q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
-            print (q_out)
+            #print (q_out)
             with open(q_out, 'wt') as out:
                 out.write(','.join(vals))
 
@@ -53,8 +61,6 @@ def get_dwr_graph(gage, outfile=None):
     with open(outfile, 'wb') as out:
         shutil.copyfileobj(response.raw, out)
     
-    #print response.status_code
-    #print response.text
 
 def get_usgs_gage(gage, outfile=None):
     """
@@ -110,7 +116,7 @@ def get_usgs_gage(gage, outfile=None):
                 _next = parent.next_sibling
                 q = pull_val(_next)
                 q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
-                print (q_out)
+                #print (q_out)
                 with open(q_out, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
@@ -119,33 +125,40 @@ def get_usgs_gage(gage, outfile=None):
                 #_next = parent.next_sibling
                 #stage =  pull_val(_next)
 
+
 def pull_val(text):
     fields = text.split()
     for i in range(len(fields)):
         if fields[i] == 'value:':
-            return (fields[i+1], fields[i+2], fields[i+3])
+            try:
+                return (fields[i+1], fields[i+2], fields[i+3])
+            except IndexError as e:
+                return ('N/A', 'Gauge appears to be offline', '')
+
+
 def main():
     gages = gageman.get_gages()
     for gage in gages[::-1]:
         if gage.gage_type == 'USGS':
-            print ('*** working on USGS gage:' + str(gage))
+            #print ('*** working on USGS gage:' + str(gage))
             outfile = OUTPATH + gage.image()
             try:
                 get_usgs_gage(gage.gage_id, outfile)
-                print ('success')
+                #print ('success')
             except FailedImageAddr:
                 try:
-                    print ('no image address, trying again...')
+                    #print ('no image address, trying again...')
                     time.sleep(SLEEP)
                     get_usgs_gage(gage.gage_id, outfile)
-                    print ('success')
+                    #print ('success')
                 except FailedImageAddr:
-                    print ('failed to download gage, skipping')
+                    pass
+                    #print ('failed to download gage, skipping')
         elif gage.gage_type == 'DWR':
-            print ('processing DWR gage:' + str(gage))
+            #print ('processing DWR gage:' + str(gage))
             outfile = OUTPATH + gage.image()
             get_dwr_graph(gage.gage_id, outfile)
-            print ('success')
+            #print ('success')
         else: 
             raise AttributeError('gage was returned from get_gages() that is not USGS or DWR')
         time.sleep(SLEEP)
