@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup
 import shutil
 import time
 import gageman
+import sys
 
 OUTPATH = '/var/www/rivergraphs/app/static/'
 
 SLEEP = 5  # seconds between pulling gages
+
 
 class URLError(Exception):
     pass
@@ -55,6 +57,7 @@ def get_dwr_graph(gage, outfile=None):
             #print (q_out)
             with open(q_out, 'wt') as out:
                 out.write(','.join(vals))
+                out.write('\n')
 
     # Get and save the image
     response = requests.get(img_addr, stream=True, cookies=response.cookies)
@@ -137,28 +140,39 @@ def pull_val(text):
 
 
 def main():
+    verbose = False
+    if len(sys.argv) > 1:
+        verbose = True
+
     gages = gageman.get_gages()
     for gage in gages[::-1]:
         if gage.gage_type == 'USGS':
-            #print ('*** working on USGS gage:' + str(gage))
+            if verbose:
+                print ('*** working on USGS gage:' + str(gage))
+
             outfile = OUTPATH + gage.image()
             try:
                 get_usgs_gage(gage.gage_id, outfile)
-                #print ('success')
+                if verbose:
+                    print ('success')
             except FailedImageAddr:
                 try:
-                    #print ('no image address, trying again...')
+                    if verbose:
+                        print ('no image address, trying again...')
                     time.sleep(SLEEP)
                     get_usgs_gage(gage.gage_id, outfile)
-                    #print ('success')
+                    if verbose:
+                        print ('success')
                 except FailedImageAddr:
-                    pass
-                    #print ('failed to download gage, skipping')
+                    if verbose:
+                        print ('failed to download gage, skipping')
         elif gage.gage_type == 'DWR':
-            #print ('processing DWR gage:' + str(gage))
+            if verbose:
+                print ('processing DWR gage:' + str(gage))
             outfile = OUTPATH + gage.image()
             get_dwr_graph(gage.gage_id, outfile)
-            #print ('success')
+            if verbose:
+                print ('success')
         else: 
             raise AttributeError('gage was returned from get_gages() that is not USGS or DWR')
         time.sleep(SLEEP)

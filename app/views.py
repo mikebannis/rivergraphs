@@ -39,6 +39,13 @@ def front_range():
     rivers = gageman.get_rivers(gages)
     return render_template('flows.html', rivers=rivers)
 
+@app.route('/durango')
+def durango():
+    gages = gageman.get_gages()
+    gages = [g for g in gages if g.region == 'Durango']
+    rivers = gageman.get_rivers(gages)
+    return render_template('flows.html', rivers=rivers)
+
 @app.route('/multiday')
 def multiday():
     gages = gageman.get_gages()
@@ -50,6 +57,13 @@ def multiday():
 def central():
     gages = gageman.get_gages()
     gages = [g for g in gages if g.region == 'Central']
+    rivers = gageman.get_rivers(gages)
+    return render_template('flows.html', rivers=rivers)
+
+@app.route('/west_virginia')
+def wv():
+    gages = gageman.get_gages()
+    gages = [g for g in gages if g.region == 'WV']
     rivers = gageman.get_rivers(gages)
     return render_template('flows.html', rivers=rivers)
 

@@ -48,9 +48,15 @@ class Gage(object):
             with open(q_file, 'rt') as infile:
                 data = infile.readline()
             fields = data.strip().split(',')
-            self.q = fields[0]  # First field is discharge
-            self.q_date = fields[1] 
-            self.q_time = fields[2] 
+            try:
+                self.q = fields[0]  # First field is discharge
+                self.q_date = fields[1] 
+                self.q_time = fields[2] 
+            except IndexError:
+                print('Error getting data for {}, fields: {}'.format(self.gage_id, fields))
+                self.q = 9999
+                self.q_date = 9999
+                self.q_time = 9999
 
     def __str__(self):
         return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' + self.location + \
@@ -61,7 +67,8 @@ def get_gages(filename=GAGEFILE):
     with open(filename, 'rt') as infile:
         rdr = csv.DictReader(filter(lambda row: row[0]!='#', infile))
         for row in rdr:
-            temp_gage = Gage(row['gage_id'], row['type'], row['river'], row['location'], row['region'])
+            temp_gage = Gage(row['gage_id'], row['type'], row['river'], 
+                             row['location'], row['region'])
             gages.append(temp_gage)
     return gages
 
