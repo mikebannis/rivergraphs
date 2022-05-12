@@ -1,10 +1,13 @@
 #!/usr/bin/python
+from __future__ import print_function
+
 import requests
 from bs4 import BeautifulSoup
 import shutil
 import time
 import gageman
 import sys
+
 
 OUTPATH = '/var/www/rivergraphs/app/static/'
 
@@ -19,50 +22,43 @@ class FailedImageAddr(Exception):
 
 def get_dwr_graph(gage, outfile=None):
     """
-    Grabs default flow graph for Colorado DWR Gage 'gage' and write image to outfile.
+    Grabs default flow graph for Colorado DWR Gage 'gage' 
+
     param: gage - string ('PLAGRAC' is south platte at grant, i.e. bailey gage)
     prarm: outfile - name of file to export 
     """
-    #TODO - check for .png at end of outfile
-    gage_url = 'https://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID='+gage
+    # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
+    gage_url = 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
+                'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
+                str(gage) + '&parameter=DISCHRG'
+
     if outfile is None:
         outfile = gage+'.png'
+
+    print('checking for', gage_url)
     response = requests.get(gage_url)
     
     # Verify we got good stuff back
     if response.status_code != 200:
-        raise URLError(response.status_code, response.text)
+       raise URLError(response.status_code, response.text)
 
-    # Grab the image url
-    img_addr = None
-    soup = BeautifulSoup(response.text, 'html.parser')
-    for img in soup.find_all('img'):
-        #print (img)
-        _id = img.get('id')
-        #print (_id)
-        #"ContentPlaceHolder1_ctl00"
-        if _id == 'ContentPlaceHolder1_ctl00':
-            img_addr = 'https://www.dwr.state.co.us' + img.get('src')
+    last_result = response.json()['ResultList'][-1]
+    if last_result['measUnit'] != 'cfs':
+        raise ValueError('Wrong unit type in last result: ' + str(last_result))
 
-    if img_addr is None:
-        print ('Unable to get image for gage', gage)
-        return
-
-    # Grab the most recent discharge
-    for texts in soup.findAll(text=True):
-        if 'cfs' in texts:
-            vals = texts.strip().split()
-            vals.pop(1)  # Ditch the 'cfs' text
-            q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
-            #print (q_out)
-            with open(q_out, 'wt') as out:
-                out.write(','.join(vals))
-                out.write('\n')
+    q = last_result['measValue']
+    timestamp = last_result['measDateTime']
+    date = timestamp.split('T')[0]
+    time = timestamp.split('T')[1]
+    
+    q_outfile = outfile[:-4]+'.cfs' 
+    with open(q_outfile, 'wt') as out:
+        out.write('{},{},{}\n'.format(q, date, time))
 
     # Get and save the image
-    response = requests.get(img_addr, stream=True, cookies=response.cookies)
-    with open(outfile, 'wb') as out:
-        shutil.copyfileobj(response.raw, out)
+    #response = requests.get(img_addr, stream=True, cookies=response.cookies)
+    #with open(outfile, 'wb') as out:
+    #    shutil.copyfileobj(response.raw, out)
     
 
 def get_usgs_gage(gage, outfile=None):
