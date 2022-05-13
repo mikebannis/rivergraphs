@@ -32,13 +32,7 @@ def get_dwr_graph(gage, outfile=None):
                 'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
                 str(gage) + '&parameter=DISCHRG'
 
-    if outfile is None:
-        outfile = gage+'.png'
-
-    print('checking for', gage_url)
     response = requests.get(gage_url)
-    
-    # Verify we got good stuff back
     if response.status_code != 200:
        raise URLError(response.status_code, response.text)
 
@@ -51,8 +45,11 @@ def get_dwr_graph(gage, outfile=None):
     date = timestamp.split('T')[0]
     time = timestamp.split('T')[1]
     
+    if outfile is None:
+        outfile = gage+'.png'
     q_outfile = outfile[:-4]+'.cfs' 
-    with open(q_outfile, 'wt') as out:
+
+    with open(q_outfile, 'at') as out:
         out.write('{},{},{}\n'.format(q, date, time))
 
     # Get and save the image
@@ -142,33 +139,32 @@ def main():
 
     gages = gageman.get_gages()
     for gage in gages[::-1]:
-        if gage.gage_type == 'USGS':
-            if verbose:
-                print ('*** working on USGS gage:' + str(gage))
+        if verbose:
+            print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
+        if gage.gage_type == 'USGS':
             outfile = OUTPATH + gage.image()
             try:
                 get_usgs_gage(gage.gage_id, outfile)
-                if verbose:
-                    print ('success')
             except FailedImageAddr:
                 try:
                     if verbose:
                         print ('no image address, trying again...')
                     time.sleep(SLEEP)
                     get_usgs_gage(gage.gage_id, outfile)
-                    if verbose:
-                        print ('success')
                 except FailedImageAddr:
                     if verbose:
                         print ('failed to download gage, skipping')
-        elif gage.gage_type == 'DWR':
+                    continue
             if verbose:
-                print ('processing DWR gage:' + str(gage))
+                print ('success')
+
+        elif gage.gage_type == 'DWR':
             outfile = OUTPATH + gage.image()
             get_dwr_graph(gage.gage_id, outfile)
             if verbose:
                 print ('success')
+
         else: 
             raise AttributeError('gage was returned from get_gages() that is not USGS or DWR')
         time.sleep(SLEEP)

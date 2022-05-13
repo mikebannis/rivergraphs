@@ -42,11 +42,16 @@ class Gage(object):
              #       self.gage_id + '&MTYPE=DISCHRG'
 
     def _get_q(self):
-        """ Pulls and returns most recent discharge from *.cfs file in static directory """
+        """ 
+        Pulls and returns most recent discharge from *.cfs file in static directory 
+        """
         q_file = os.path.join(STATIC, self.gage_id + '.cfs')
         if os.path.isfile(q_file):
+            # Grab last line from gage data file
             with open(q_file, 'rt') as infile:
-                data = infile.readline()
+                for data in infile:
+                    pass
+
             fields = data.strip().split(',')
             try:
                 self.q = fields[0]  # First field is discharge
@@ -59,8 +64,8 @@ class Gage(object):
                 self.q_time = 9999
 
     def __str__(self):
-        return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' + self.location + \
-                ',' + self.region
+        return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' +\
+                self.location + ',' + self.region
 
 def get_gages(filename=GAGEFILE):
     gages = []
@@ -82,6 +87,3 @@ def get_rivers(gages):
     for gage in gages:
         rivers[gage.river].append(gage)
     return rivers
-
-if __name__ == '__main__':
-    get_graphs_new()
