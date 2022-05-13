@@ -27,10 +27,18 @@ class Gage(object):
             raise AttributeError('gage_type must be USGS or DWR, was passed ' + gage_type)
     
     def image(self):
+        """ Return file name for gage image"""
         if self.gage_type == 'USGS':
-            return self.gage_id + '.gif'
+            img_file = self.gage_id + '.gif'
         else:
-            return self.gage_id + '.png'
+            img_file = self.gage_id + '.png'
+
+        return img_file
+
+    def image_exists(self):
+        """ Returns true if the image exists"""
+        path = os.path.dirname(os.path.abspath(__file__))
+        return os.path.exists(os.path.join(path, 'static', self.image()))
 
     def url(self):
         """ Return URL to USGS or DWR gage page """
@@ -54,7 +62,10 @@ class Gage(object):
 
             fields = data.strip().split(',')
             try:
-                self.q = fields[0]  # First field is discharge
+                if self._is_float(fields[0]):
+                    self.q = int(float(fields[0]))
+                else:
+                    self.q = 'Error'
                 self.q_date = fields[1] 
                 self.q_time = fields[2] 
             except IndexError:
@@ -62,6 +73,14 @@ class Gage(object):
                 self.q = 9999
                 self.q_date = 9999
                 self.q_time = 9999
+
+    @staticmethod
+    def _is_float(s):
+        try:
+            x = float(s)
+            return True
+        except ValueError:
+            return False
 
     def __str__(self):
         return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' +\

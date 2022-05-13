@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-    Colorado River Gages
     {% for river, gages in rivers.items() %}
-    <h1> {{ river }} </h1>
-        {% for gage in gages %}
-            <div style="display: inline-block">
-                <h3> <a href="{{ gage.url() }}"> {{ gage.location }} </a>&emsp; {{ gage.q }} cfs </h3> at {{gage.q_time}} {{gage.q_date}}
-                <p><img src={{ url_for('static', filename=gage.image()) }}></div>
-        {% endfor %}
+      <h2> {{ river }} </h2>
+        <div class="row mb-0">
+            {% for gage in gages %}
+              <div class="col-xl-6 mb-5">
+                <div class="row">
+                  <h4> 
+                    <a href="{{ gage.url() }}">{{ gage.location }}</a> &emsp; 
+                    <b>{{ gage.q }} cfs </b>
+                    <small>@ {{gage.q_time}} {{gage.q_date}}</small>
+                  </h4> 
+                </div>
+
+                {% if gage.image_exists(): %}
+                  <div class="row">
+                    <img src={{ url_for('static', filename=gage.image()) }}>
+                  </div>
+                {% endif %}
+              </div>
+          {% endfor %}
+        </div>
     {% endfor %}
 {% endblock %}
