@@ -5,4 +5,4 @@
 .*.swp
 logs
 logs/*
-app/gages.csv
+app/static
