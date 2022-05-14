@@ -1,1 +1,62 @@
-/var/www/rivergraphs/app/gages.csv
+gage_id,type,river,location,region
+# ---- Clear Creek
+06716500,USGS,Clear Creek,Dumont,FR
+06719505,USGS,Clear Creek,Golden,FR
+# --- Arkansas
+ARKGRNCO,DWR,Arkansas River,Granite,Ark
+07087050,USGS,Arkansas River,Numbers Putin,Ark
+07091200,USGS,Arkansas River,Browns/Nathrup,Ark
+07094500,USGS,Arkansas River,Parkdale,Ark
+# ---- Arkansas River Headwaters
+07083710,USGS,Arkansas Headwaters,Arkansas Near Malta,Ark
+CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark
+CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
+LAKBTLCO,DWR,Arkansas Headwaters,Lake Creek Below Twin Lakes Reservoir,Ark
+# ---- Bailey 
+ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR
+PLAGRACO,DWR,North Fork South Platte,Grant Gage,FR
+PLABAICO,DWR,North Fork South Platte,Bailey,FR
+# ---- South Fork of the South Platte
+PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
+# ---- South Platte
+PLASPLCO,DWR,South Platte,Waterton Canyon,FR
+# ---- South Boulder Creek 
+BOCPINCO,DWR,South Boulder Creek,Above Gross Res - Alto Alto,FR
+# ---- Big Thompson
+BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR
+# ---- Big South
+LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR
+# --- Colorado River
+09058000,USGS,Colorado River,Kremmling - Gore,Central
+09070500,USGS,Colorado River,Dotsero - Glenwood Canyon,Central
+# -- crystal
+09081600,USGS,Crystal River,Near Redstone,Central
+09064600,USGS,Eagle River,Minturn,Central
+# -- roaring fork
+09076300,USGS,Roaring Fork,Slaughterhouse,Central
+# -- crested butte area
+09112200,USGS,Upper East,Below Cement Creek,Central
+385106106571000,USGS,Slate River,Near Crested Butte,Central
+# ------- Durango
+09359020,USGS,Animas River,Below Silverton,Durango
+09359500,USGS,Animas River,Tacoma,Durango
+09361500,USGS,Animas River,Durango,Durango
+09349800,USGS,Piedra,Near Arboles CO,Durango
+# -- multiday stuff
+09163500,USGS,Colorado River,State Line - Westwater,Multi
+09234500,USGS,Green River,Greendale UT - Gates of Lodore,Multi
+09315000,USGS,Green River,Green River UT - Deso-Grey,Multi
+09330500,USGS,Muddy Creek,Near Emery,Multi
+09497500,USGS,Salt River,Near Chrysotile AZ,Multi
+09168730,USGS,Dolores River,Near Slick Rock CO,Multi
+06620000,USGS,North Platte River,Near Northgate CO,Multi
+09380000,USGS,Colorado River,Lee's Ferry,Multi
+09405500,USGS,North Fork Virgin,Zion,Multi
+# -- WV stuff
+03192000,USGS,Gauley River,Above Belva,WV
+03185400,USGS,New River,Thurmond,WV
+03193000,USGS,Kanawha River,Kanawha Falls,WV
+03190000,USGS,Meadow River,Anllen,WV
+03076500,USGS,Upper Youghiogheny,Friendsville. MD,WV
+03187500,USGS,Cranberry River,Near Richwood,WV
+03057000,USGS,Tygart Valley River,Colfax,WV
