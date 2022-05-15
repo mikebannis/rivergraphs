@@ -1,12 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import print_function
 
-import requests
-from bs4 import BeautifulSoup
 import shutil
 import time
-import gageman
 import sys
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime as dt
+from datetime import timedelta
+from matplotlib import pyplot as plt
+
+import gageman
 
 
 OUTPATH = '/var/www/rivergraphs/app/static/'
@@ -36,6 +40,9 @@ def get_dwr_graph(gage, outfile=None):
     if response.status_code != 200:
        raise URLError(response.status_code, response.text)
 
+    # TODO - write all results to file, and make figure
+    last_result = response.json()['ResultList'][-1]
+
     last_result = response.json()['ResultList'][-1]
     if last_result['measUnit'] != 'cfs':
         raise ValueError('Wrong unit type in last result: ' + str(last_result))
@@ -46,17 +53,31 @@ def get_dwr_graph(gage, outfile=None):
     time = timestamp.split('T')[1]
     
     if outfile is None:
-        outfile = gage+'.png'
-    q_outfile = outfile[:-4]+'.cfs' 
+        outfile = gage+'.cfs'
 
-    with open(q_outfile, 'at') as out:
+    with open(outfile, 'wt') as out:
         out.write('{},{},{}\n'.format(q, date, time))
 
-    # Get and save the image
-    #response = requests.get(img_addr, stream=True, cookies=response.cookies)
-    #with open(outfile, 'wb') as out:
-    #    shutil.copyfileobj(response.raw, out)
+    # --- Plot and save the hydrograph
+    date_f = '%Y-%m-%dT%H:%M:%S'
+    raw_qs = [r['measValue'] for r in response.json()['ResultList']]
+    raw_tss = [dt.strptime(r['measDateTime'], date_f) for r in 
+                  response.json()['ResultList']]
     
+    # only show last 7 days
+    qs = []
+    tss = []
+    delta = timedelta(days=7)
+    for q, ts in zip(raw_qs, raw_tss):
+        if raw_tss[-1] - ts > delta:
+            continue
+        qs.append(q)
+        tss.append(ts)
+
+    i_outfile = outfile[:-4]+'.png' 
+    plt.plot(tss, qs)
+    plt.savefig(i_outfile)
+
 
 def get_usgs_gage(gage, outfile=None):
     """
