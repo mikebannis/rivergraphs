@@ -18,6 +18,8 @@ OUTPATH = '/var/www/rivergraphs/app/static/'
 
 SLEEP = 5  # seconds between pulling gages
 
+VERBOSE = False
+
 
 class URLError(Exception):
     pass
@@ -25,12 +27,12 @@ class URLError(Exception):
 class FailedImageAddr(Exception):
     pass
 
-def get_dwr_graph(gage, outfile=None):
+def get_dwr_graph(gage, outfile, verbose=False):
     """
     Grabs default flow graph for Colorado DWR Gage 'gage'
 
     param: gage - string ('PLAGRAC' is south platte at grant, i.e. bailey gage)
-    prarm: outfile - name of file to export
+    prarm: outfile - name and path of DATA (.csv) file to export
     """
     # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
     gage_url = 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
@@ -53,11 +55,11 @@ def get_dwr_graph(gage, outfile=None):
     date = timestamp.split('T')[0]
     time = timestamp.split('T')[1]
 
-    if outfile is None:
-        outfile = gage+'.cfs'
-
     with open(outfile, 'wt') as out:
-        out.write('{},{},{}\n'.format(q, date, time))
+        data = '{},{},{}'.format(q, date, time) 
+        if verbose:
+            print(f'\tWriting {data} to {outfile}')
+        out.write(data+'\n')
 
     # --- Plot and save the hydrograph
     date_f = '%Y-%m-%dT%H:%M:%S'
@@ -91,7 +93,7 @@ def get_usgs_gage(gage, outfile=None):
     """
     Grabs default flow graph for USGS Gage 'gage' and write image to outfile.
     param: gage - string ('0671950' is clear creek at golden)
-    prarm: outfile - name of file to export
+    prarm: outfile - name and path of IMAGE (.png) file to export
     """
     gage_url = 'https://waterdata.usgs.gov/usa/nwis/uv?'+gage
     if outfile is None:
@@ -162,13 +164,19 @@ def pull_val(text):
 
 
 def main():
-    verbose = False
-    if len(sys.argv) > 1:
-        verbose = True
-
     gages = gageman.get_gages()
-    for gage in gages[::-1]:
-        if verbose:
+
+    if len(sys.argv) > 1:
+        VERBOSE = True
+        if sys.argv[1].lower() == 'dwr':
+            gages = [g for g in gages if g.gage_type == 'DWR']
+        elif sys.argv[1].lower() == 'usgs':
+            gages = [g for g in gages if g.gage_type == 'USGS']
+        elif sys.argv[1].lower() == 'reverse':
+            gages = gages[::-1]
+
+    for gage in gages:
+        if VERBOSE:
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
         if gage.gage_type == 'USGS':
@@ -177,22 +185,22 @@ def main():
                 get_usgs_gage(gage.gage_id, outfile)
             except FailedImageAddr:
                 try:
-                    if verbose:
-                        print ('no image address, trying again...')
+                    if VERBOSE:
+                        print ('\tno image address, trying again...')
                     time.sleep(SLEEP)
                     get_usgs_gage(gage.gage_id, outfile)
                 except FailedImageAddr:
-                    if verbose:
-                        print ('failed to download gage, skipping')
+                    if VERBOSE:
+                        print ('\tfailed to download gage, skipping')
                     continue
-            if verbose:
-                print ('success')
+            if VERBOSE:
+                print ('\tsuccess')
 
         elif gage.gage_type == 'DWR':
-            outfile = OUTPATH + gage.image()
-            get_dwr_graph(gage.gage_id, outfile)
-            if verbose:
-                print ('success')
+            outfile = OUTPATH + gage.data_file()
+            get_dwr_graph(gage.gage_id, outfile, verbose=VERBOSE)
+            if VERBOSE:
+                print ('\tsuccess')
 
         else:
             raise AttributeError('gage was returned from get_gages() that is not USGS or DWR')

@@ -35,6 +35,10 @@ class Gage(object):
 
         return img_file
 
+    def data_file(self):
+        """ Return file name for gage data """
+        return f'{self.gage_id}.cfs'
+
     def image_exists(self):
         """ Returns true if the image exists"""
         path = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +57,7 @@ class Gage(object):
         """ 
         Pulls and returns most recent discharge from *.cfs file in static directory 
         """
-        q_file = os.path.join(STATIC, self.gage_id + '.cfs')
+        q_file = os.path.join(STATIC, self.data_file())
         if os.path.isfile(q_file):
             # Grab last line from gage data file
             with open(q_file, 'rt') as infile:
