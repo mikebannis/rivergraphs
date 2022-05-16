@@ -2,6 +2,7 @@ gage_id,type,river,location,region
 # ---- Clear Creek
 06716500,USGS,Clear Creek,Dumont,FR
 06719505,USGS,Clear Creek,Golden,FR
+CHUDITCO,DWR,Clear Creek,Church Ditch,FR
 # --- Arkansas
 ARKGRNCO,DWR,Arkansas River,Granite,Ark
 07087050,USGS,Arkansas River,Numbers Putin,Ark
