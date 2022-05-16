@@ -18,8 +18,6 @@ OUTPATH = '/var/www/rivergraphs/app/static/'
 
 SLEEP = 5  # seconds between pulling gages
 
-VERBOSE = False
-
 
 class URLError(Exception):
     pass
@@ -165,9 +163,9 @@ def pull_val(text):
 
 def main():
     gages = gageman.get_gages()
-
+    verbose = False
     if len(sys.argv) > 1:
-        VERBOSE = True
+        verbose = True
         if sys.argv[1].lower() == 'dwr':
             gages = [g for g in gages if g.gage_type == 'DWR']
         elif sys.argv[1].lower() == 'usgs':
@@ -176,7 +174,7 @@ def main():
             gages = gages[::-1]
 
     for gage in gages:
-        if VERBOSE:
+        if verbose:
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
         if gage.gage_type == 'USGS':
@@ -185,21 +183,21 @@ def main():
                 get_usgs_gage(gage.gage_id, outfile)
             except FailedImageAddr:
                 try:
-                    if VERBOSE:
+                    if verbose:
                         print ('\tno image address, trying again...')
                     time.sleep(SLEEP)
                     get_usgs_gage(gage.gage_id, outfile)
                 except FailedImageAddr:
-                    if VERBOSE:
+                    if verbose:
                         print ('\tfailed to download gage, skipping')
                     continue
-            if VERBOSE:
+            if verbose:
                 print ('\tsuccess')
 
         elif gage.gage_type == 'DWR':
             outfile = OUTPATH + gage.data_file()
-            get_dwr_graph(gage.gage_id, outfile, verbose=VERBOSE)
-            if VERBOSE:
+            get_dwr_graph(gage.gage_id, outfile, verbose=verbose)
+            if verbose:
                 print ('\tsuccess')
 
         else:
