@@ -34,7 +34,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
-    response = requests.get(gage.url())
+    response = requests.get(gage.data_url())
     if response.status_code != 200:
        raise URLError(response.status_code, response.text)
 
@@ -90,7 +90,7 @@ def get_usgs_gage(gage, outpath):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
-    response = requests.get(gage.url())
+    response = requests.get(gage.data_url())
 
     # Verify we got good stuff back
     if response.status_code != 200:

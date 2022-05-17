@@ -11,7 +11,7 @@ ARKGRNCO,DWR,Arkansas River,Granite,Ark
 # ---- Arkansas River Headwaters
 07083710,USGS,Arkansas Headwaters,Arkansas Near Malta,Ark
 CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark
-CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
+#CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
 LAKBTLCO,DWR,Arkansas Headwaters,Lake Creek Below Twin Lakes Reservoir,Ark
 # ---- Bailey 
 ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR

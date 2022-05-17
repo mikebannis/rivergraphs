@@ -43,8 +43,8 @@ class Gage(object):
         path = os.path.dirname(os.path.abspath(__file__))
         return os.path.exists(os.path.join(path, 'static', self.image_file()))
 
-    def url(self):
-        """ Return URL to USGS or DWR gage page """
+    def data_url(self):
+        """ Return data URL for gage"""
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         else:
@@ -56,6 +56,13 @@ class Gage(object):
             #return 'https://dwr.state.co.us/Tools/Stations/' + self.gage_id
             # return 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID=' + \
              #       self.gage_id + '&MTYPE=DISCHRG'
+
+    def url(self):
+        """ Return URL to human readable USGS or DWR gage page """
+        if self.gage_type == 'USGS':
+            return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
+        else:
+            return f'https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG'
 
     def _get_q(self):
         """
