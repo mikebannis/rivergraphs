@@ -8,7 +8,7 @@
         crossorigin="anonymous">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-info">
       <div class="container-fluid">
         <a class="navbar-brand " href="/">RiverGraphs</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -19,27 +19,25 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/front_range">
-                Front Range
-              </a>
+              {{ nav_link('/front_range', 'Front Range') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/arkansas">Arkansas</a>
+              {{ nav_link('/arkansas', 'Arkansas') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/central">Central Mountains</a>
+              {{ nav_link('/central', 'Central Mountains') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/durango">Durango</a>
+              {{ nav_link('/durango', 'Durango') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/multiday">Multi-day</a>
+              {{ nav_link('/multiday', 'Multi=Day') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/west_virginia">West Virginia</a>
+              {{ nav_link('/west_virginia', 'West Virginia') | safe }}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/snotel">Snotel</a>
+              {{ nav_link('/snotel', 'Snotel') | safe }}
             </li>
           </ul>
         </div>
