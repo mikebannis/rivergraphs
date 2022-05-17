@@ -41,7 +41,7 @@ class Gage(object):
     def image_exists(self):
         """ Returns true if the image exists"""
         path = os.path.dirname(os.path.abspath(__file__))
-        return os.path.exists(os.path.join(path, 'static', self.image()))
+        return os.path.exists(os.path.join(path, 'static', self.image_file()))
 
     def url(self):
         """ Return URL to USGS or DWR gage page """
