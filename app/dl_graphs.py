@@ -1,9 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 from __future__ import print_function
 
-import shutil
-import time
+import os
 import sys
+import time
+import shutil
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime as dt
@@ -12,9 +13,8 @@ import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
 
 import gageman
+import util
 
-
-OUTPATH = '/var/www/rivergraphs/app/static/'
 
 SLEEP = 5  # seconds between pulling gages
 
@@ -54,7 +54,7 @@ def get_dwr_graph(gage, outfile, verbose=False):
     time = timestamp.split('T')[1]
 
     with open(outfile, 'wt') as out:
-        data = '{},{},{}'.format(q, date, time) 
+        data = '{},{},{}'.format(q, date, time)
         if verbose:
             print(f'\tWriting {data} to {outfile}')
         out.write(data+'\n')
@@ -103,23 +103,6 @@ def get_usgs_gage(gage, outfile=None):
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
 
-#    # Grab the image url
-#    img_addr = None
-#    soup = BeautifulSoup(response.text, 'html.parser')
-#    for img in soup.find_all('img'):
-#        #print(img, img.get('alt'))
-#
-#        if img.get('alt') == "Graph of ":
-#            img_addr =  img.get('src')
-#            break
-#    if img_addr is None:
-#        raise FailedImageAddr('image address not found for '+gage)
-#
-#    # Grab and save the image
-#    response = requests.get(img_addr, stream=True, cookies=response.cookies)
-#    with open(outfile, 'wb') as out:
-#        shutil.copyfileobj(response.raw, out)
-
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Get the discharge
@@ -127,6 +110,7 @@ def get_usgs_gage(gage, outfile=None):
         if tag.get('name') == "gifno-99":
             if tag.getText().strip() == 'Discharge, cubic feet per second':
                 parent = tag.parent
+
                 # Grab the graph and save it
                 img = parent.parent.find_next('img')
                 if img.get('alt') == "Graph of ":
@@ -134,6 +118,7 @@ def get_usgs_gage(gage, outfile=None):
                 else:
                     raise FailedImageAddr('image address not found for '+gage)
                 response = requests.get(img_addr, stream=True, cookies=response.cookies)
+
                 with open(outfile, 'wb') as out:
                     shutil.copyfileobj(response.raw, out)
 
@@ -178,7 +163,7 @@ def main():
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
         if gage.gage_type == 'USGS':
-            outfile = OUTPATH + gage.image()
+            outfile = os.path.join(util.static_dir(), gage.image())
             try:
                 get_usgs_gage(gage.gage_id, outfile)
             except FailedImageAddr:
@@ -186,6 +171,7 @@ def main():
                     if verbose:
                         print ('\tno image address, trying again...')
                     time.sleep(SLEEP)
+                    # TODO - this is messy, don't pass the outfile
                     get_usgs_gage(gage.gage_id, outfile)
                 except FailedImageAddr:
                     if verbose:
@@ -195,7 +181,8 @@ def main():
                 print ('\tsuccess')
 
         elif gage.gage_type == 'DWR':
-            outfile = OUTPATH + gage.data_file()
+            outfile = os.path.join(util.static_dir(), gage.data_file())
+            # TODO - this is messy, don't pass the outfile
             get_dwr_graph(gage.gage_id, outfile, verbose=verbose)
             if verbose:
                 print ('\tsuccess')
