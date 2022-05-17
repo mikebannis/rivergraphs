@@ -25,7 +25,7 @@ class Gage(object):
         if gage_type != 'USGS' and gage_type != 'DWR':
             raise AttributeError('gage_type must be USGS or DWR, was passed ' + gage_type)
 
-    def image(self):
+    def image_file(self):
         """ Return file name for gage image"""
         if self.gage_type == 'USGS':
             img_file = self.gage_id + '.gif'
@@ -48,7 +48,12 @@ class Gage(object):
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         else:
-            return 'https://dwr.state.co.us/Tools/Stations/' + self.gage_id
+            # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
+            return 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
+                    'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
+                    f'{self.gage_id}&parameter=DISCHRG'
+
+            #return 'https://dwr.state.co.us/Tools/Stations/' + self.gage_id
             # return 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID=' + \
              #       self.gage_id + '&MTYPE=DISCHRG'
 
@@ -90,6 +95,11 @@ class Gage(object):
                 self.location + ',' + self.region
 
 def get_gages():
+    """
+    Load gages from gage files
+
+    @returns {list of Gage}
+    """
     gages = []
     with open(util.gages_file(), 'rt') as infile:
         rdr = csv.DictReader(filter(lambda row: row[0]!='#', infile))
@@ -102,6 +112,7 @@ def get_gages():
 def get_rivers(gages):
     """
     Organizes gages by river
+
     :param gages: dict from get_gages()
     :returns: dict of gages organized by river
     """

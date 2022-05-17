@@ -18,7 +18,7 @@
 
                 {% if gage.image_exists(): %}
                   <div class="row">
-                    <img src={{ url_for('static', filename=gage.image()) }}>
+                    <img src={{ url_for('static', filename=gage.image_file()) }}>
                   </div>
                 {% endif %}
               </div>

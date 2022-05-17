@@ -22,27 +22,21 @@ SLEEP = 5  # seconds between pulling gages
 class URLError(Exception):
     pass
 
+
 class FailedImageAddr(Exception):
     pass
 
-def get_dwr_graph(gage, outfile, verbose=False):
+
+def get_dwr_graph(gage, outpath, verbose=False):
     """
     Grabs default flow graph for Colorado DWR Gage 'gage'
 
-    param: gage - string ('PLAGRAC' is south platte at grant, i.e. bailey gage)
-    prarm: outfile - name and path of DATA (.csv) file to export
+    param: gage - gageman.Gage instance
+    prarm: outpath - path to output dir
     """
-    # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
-    gage_url = 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
-                'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
-                str(gage) + '&parameter=DISCHRG'
-
-    response = requests.get(gage_url)
+    response = requests.get(gage.url())
     if response.status_code != 200:
        raise URLError(response.status_code, response.text)
-
-    # TODO - write all results to file, and make figure
-    last_result = response.json()['ResultList'][-1]
 
     last_result = response.json()['ResultList'][-1]
     if last_result['measUnit'] != 'cfs':
@@ -53,6 +47,7 @@ def get_dwr_graph(gage, outfile, verbose=False):
     date = timestamp.split('T')[0]
     time = timestamp.split('T')[1]
 
+    outfile = os.path.join(outpath, gage.data_file())
     with open(outfile, 'wt') as out:
         data = '{},{},{}'.format(q, date, time)
         if verbose:
@@ -75,7 +70,7 @@ def get_dwr_graph(gage, outfile, verbose=False):
         qs.append(q)
         tss.append(ts)
 
-    i_outfile = outfile[:-4]+'.png'
+    i_outfile = os.path.join(outpath, gage.image_file())
 
     fmt = mdates.DateFormatter('%b\n%d') # May\n5
     #fig, ax = plt.subplots(1, figsize=(6.4, 4.1), dpi=100)
@@ -88,17 +83,14 @@ def get_dwr_graph(gage, outfile, verbose=False):
     plt.close()
 
 
-def get_usgs_gage(gage, outfile=None):
+def get_usgs_gage(gage, outpath):
     """
     Grabs default flow graph for USGS Gage 'gage' and write image to outfile.
-    param: gage - string ('0671950' is clear creek at golden)
-    prarm: outfile - name and path of IMAGE (.png) file to export
-    """
-    gage_url = 'https://waterdata.usgs.gov/usa/nwis/uv?'+gage
-    if outfile is None:
-        outfile = gage+'.gif'
 
-    response = requests.get(gage_url)
+    param: gage - gageman.Gage instance
+    prarm: outpath - path to output dir
+    """
+    response = requests.get(gage.url())
 
     # Verify we got good stuff back
     if response.status_code != 200:
@@ -117,18 +109,19 @@ def get_usgs_gage(gage, outfile=None):
                 if img.get('alt') == "Graph of ":
                     img_addr = img.get('src')
                 else:
-                    raise FailedImageAddr('image address not found for '+gage)
+                    raise FailedImageAddr('image address not found for '+gage.gage_id)
                 response = requests.get(img_addr, stream=True, cookies=response.cookies)
 
+                outfile = os.path.join(outpath, gage.image_file())
                 with open(outfile, 'wb') as out:
                     shutil.copyfileobj(response.raw, out)
 
                 # Grab the discharge and save it to a .cfs file
                 _next = parent.next_sibling
                 q = pull_val(_next)
-                q_out = outfile[:-4]+'.cfs'  # TODO this is a bit of a hack
+                q_outfile = os.path.join(outpath, gage.data_file())
                 #print (q_out)
-                with open(q_out, 'wt') as out:
+                with open(q_outfile, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
             #if tag.getText().strip() == 'Gage height, feet':
@@ -159,21 +152,21 @@ def main():
         elif sys.argv[1].lower() == 'reverse':
             gages = gages[::-1]
 
+    outpath = util.static_dir()
+
     for gage in gages:
         if verbose:
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
         if gage.gage_type == 'USGS':
-            outfile = os.path.join(util.static_dir(), gage.image())
             try:
-                get_usgs_gage(gage.gage_id, outfile)
+                get_usgs_gage(gage, outpath)
             except FailedImageAddr:
                 try:
                     if verbose:
                         print ('\tno image address, trying again...')
                     time.sleep(SLEEP)
-                    # TODO - this is messy, don't pass the outfile
-                    get_usgs_gage(gage.gage_id, outfile)
+                    get_usgs_gage(gage, outpath)
                 except FailedImageAddr:
                     if verbose:
                         print ('\tfailed to download gage, skipping')
@@ -182,9 +175,7 @@ def main():
                 print ('\tsuccess')
 
         elif gage.gage_type == 'DWR':
-            outfile = os.path.join(util.static_dir(), gage.data_file())
-            # TODO - this is messy, don't pass the outfile
-            get_dwr_graph(gage.gage_id, outfile, verbose=verbose)
+            get_dwr_graph(gage, outpath, verbose=verbose)
             if verbose:
                 print ('\tsuccess')
 
