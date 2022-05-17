@@ -77,12 +77,13 @@ def get_dwr_graph(gage, outfile, verbose=False):
 
     i_outfile = outfile[:-4]+'.png'
 
-    fmt = mdates.DateFormatter('%m-%d')
-    plt.gca().xaxis.set_major_formatter(fmt)
+    fmt = mdates.DateFormatter('%b\n%d')
+    # plt.xticks(rotation=45)
+    fig, ax = plt.subplots(1)
+    ax.plot(tss, qs)
+    ax.set_ylim(ymin=0)
+    ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
-    plt.xticks(rotation=45)
-
-    plt.plot(tss, qs)
     plt.savefig(i_outfile)
     plt.close()
 
