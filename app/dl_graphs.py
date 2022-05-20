@@ -142,6 +142,9 @@ def pull_val(text):
 
 def main():
     gages = gageman.get_gages()
+    # print(f'Downloading {len(gages)} gages')
+    # print(os.getcwd())
+
     verbose = False
     if len(sys.argv) > 1:
         verbose = True

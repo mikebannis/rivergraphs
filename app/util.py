@@ -6,12 +6,25 @@ STATIC_DIR='static'
 
 def static_dir():
     """ Return static dir path """
-    return os.path.join(APP_PATH, STATIC_DIR) if os.getcwd() == '/' else \
-        STATIC_DIR
+    if os.getcwd() == '/':
+        return os.path.join(APP_PATH, STATIC_DIR) 
+    elif os.getcwd() == '/home/mikebannister':
+        return os.path.join(APP_PATH, STATIC_DIR) 
+    elif os.path.exists(STATIC_DIR):
+        return STATIC_DIR
+    else:
+        return os.path.join(APP_PATH, STATIC_DIR) 
+
 
 def gages_file():
     """ Return full path to gages file """
-    return  os.path.join(APP_PATH, GAGE_FILE) if os.getcwd() == '/' else \
-        GAGE_FILE
+    if os.getcwd() == '/':
+        return os.path.join(APP_PATH, GAGE_FILE) 
+    elif os.getcwd() == '/home/mikebannister':
+        return os.path.join(APP_PATH, GAGE_FILE) 
+    elif os.path.exists(GAGE_FILE):
+        return GAGE_FILE
+    else:
+        return os.path.join(APP_PATH, GAGE_FILE) 
 
 
