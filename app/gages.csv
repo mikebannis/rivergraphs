@@ -15,7 +15,7 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark
 LAKBTLCO,DWR,Arkansas Headwaters,Lake Creek Below Twin Lakes Reservoir,Ark
 # ---- Bailey 
 ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR
-PLAGRACO,DWR,North Fork South Platte,Grant Gage,FR
+#PLAGRACO,DWR,North Fork South Platte,Grant Gage,FR
 PLABAICO,DWR,North Fork South Platte,Bailey,FR
 # ---- South Fork of the South Platte
 PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
