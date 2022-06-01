@@ -36,7 +36,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
     """
     response = requests.get(gage.data_url())
     if response.status_code != 200:
-       raise URLError(response.status_code, response.text)
+        raise URLError(response.status_code, response.text)
 
     last_result = response.json()['ResultList'][-1]
     if last_result['measUnit'] != 'cfs':
@@ -129,6 +129,37 @@ def get_usgs_gage(gage, outpath):
                 #_next = parent.next_sibling
                 #stage =  pull_val(_next)
 
+def get_prr_gage(gage, outpath, verbose=False):
+    """
+    Grabs default flow graph for the Poudre rock report and write image to
+    outfile.
+
+    param: gage - gageman.Gage instance
+    prarm: outpath - path to output dir
+    """
+    response = requests.get(gage.data_url())
+
+    # Verify we got good stuff back
+    if response.status_code != 200:
+        raise URLError(response.status_code, response.text)
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    try:
+    # Get the stage from header text, e.g. 'Pine View 3.4 at 0700'
+        header = soup.find(class_='entry-header')
+        stage = header.find('a').getText().split(' ')[2]
+        time = header.find('a').getText().split(' ')[4]
+        # E.g. 'May 31, 2022 By Camp Falbo '
+        meta = header.find('p').getText().split(',')
+    except Exception as e:
+        print(f'Error pulling PRR: {e}')
+        return
+
+    mmm_dd = meta[0]
+    year = meta[1].strip().split(' ')[0]
+    print(stage, time, mmm_dd, year)
+
 
 def pull_val(text):
     fields = text.split()
@@ -152,6 +183,8 @@ def main():
             gages = [g for g in gages if g.gage_type == 'DWR']
         elif sys.argv[1].lower() == 'usgs':
             gages = [g for g in gages if g.gage_type == 'USGS']
+        elif sys.argv[1].lower() == 'prr':
+            gages = [g for g in gages if g.gage_type == 'PRR']
         elif sys.argv[1].lower() == 'reverse':
             gages = gages[::-1]
 
@@ -182,8 +215,14 @@ def main():
             if verbose:
                 print ('\tsuccess')
 
+        elif gage.gage_type == 'PRR':
+            get_prr_gage(gage, outpath, verbose=verbose)
+            if verbose:
+                print ('\tsuccess')
+
         else:
-            raise AttributeError('gage was returned from get_gages() that is not USGS or DWR')
+            raise AttributeError('gage was returned from get_gages() that is '
+                                 'unknown')
         time.sleep(SLEEP)
 
 

@@ -22,8 +22,9 @@ class Gage(object):
         self.q_time = None  # tiem of most recent discharge
         self._get_q()  # Get values for q, q_date, & q_time
 
-        if gage_type != 'USGS' and gage_type != 'DWR':
-            raise AttributeError('gage_type must be USGS or DWR, was passed ' + gage_type)
+        if gage_type not in ['USGS','DWR', 'PRR']:
+            raise AttributeError('gage_type must be USGS, PRR, or DWR, was '
+                                 f'passed {gage_type}')
 
     def image_file(self):
         """ Return file name for gage image"""
@@ -47,20 +48,20 @@ class Gage(object):
         """ Return data URL for gage"""
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
+        elif self.gage_type == 'PRR':
+            return 'http://www.poudrerockreport.com/'
         else:
             # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
             return 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
                     'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
                     f'{self.gage_id}&parameter=DISCHRG'
 
-            #return 'https://dwr.state.co.us/Tools/Stations/' + self.gage_id
-            # return 'http://www.dwr.state.co.us/SurfaceWater/data/detail_graph.aspx?ID=' + \
-             #       self.gage_id + '&MTYPE=DISCHRG'
-
     def url(self):
         """ Return URL to human readable USGS or DWR gage page """
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
+        elif self.gage_type == 'PRR':
+            return 'http://www.poudrerockreport.com/'
         else:
             return f'https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG'
 
