@@ -58,8 +58,19 @@ def get_dwr_graph(gage, outpath, verbose=False):
     date_f = '%Y-%m-%dT%H:%M:%S'
     raw_qs = [r['measValue'] for r in response.json()['ResultList']]
     raw_tss = [dt.strptime(r['measDateTime'], date_f) for r in
-                  response.json()['ResultList']]
+               response.json()['ResultList']]
+    make_graph(raw_qs, raw_tss, outpath, gage)
 
+
+def make_graph(raw_qs, raw_tss, outpath, gage):
+    """
+    Make a hyrograph and save it
+
+    @param {list of float} raw_qs - list of discharges or stages
+    @param {list of Datetime} raw_tss - time stamps for readings
+    @param {str} outpath - the static dir
+    @param {gageman.Gage} gage - the gage the graph is for
+    """
     # only show last 7 days
     qs = []
     tss = []
@@ -72,7 +83,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
 
     i_outfile = os.path.join(outpath, gage.image_file())
 
-    fmt = mdates.DateFormatter('%b\n%d') # May\n5
+    fmt = mdates.DateFormatter('%b\n%d')  # May\n5
     #fig, ax = plt.subplots(1, figsize=(6.4, 4.1), dpi=100)
     fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
     ax.plot(tss, qs)
@@ -124,10 +135,18 @@ def get_usgs_gage(gage, outpath):
                 with open(q_outfile, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
-            #if tag.getText().strip() == 'Gage height, feet':
-                #parent = tag.parent
-                #_next = parent.next_sibling
-                #stage =  pull_val(_next)
+
+
+def pull_val(text):
+    """ Pull gage values for USGS """
+    fields = text.split()
+    for i in range(len(fields)):
+        if fields[i] == 'value:':
+            try:
+                return (fields[i+1], fields[i+2], fields[i+3])
+            except IndexError:
+                return ('N/A', 'Gauge appears to be offline', '')
+
 
 def get_prr_gage(gage, outpath, verbose=False):
     """
@@ -146,11 +165,11 @@ def get_prr_gage(gage, outpath, verbose=False):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     try:
-    # Get the stage from header text, e.g. 'Pine View 3.4 at 0700'
+        # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
         header = soup.find(class_='entry-header')
         stage = header.find('a').getText().split(' ')[2]
         time = header.find('a').getText().split(' ')[4]
-        # E.g. 'May 31, 2022 By Camp Falbo '
+        # Get date, e.g. 'May 31, 2022 By Camp Falbo '
         meta = header.find('p').getText().split(',')
     except Exception as e:
         print(f'Error pulling PRR: {e}')
@@ -158,17 +177,40 @@ def get_prr_gage(gage, outpath, verbose=False):
 
     mmm_dd = meta[0]
     year = meta[1].strip().split(' ')[0]
-    print(stage, time, mmm_dd, year)
+    ts = dt.strptime(f'{mmm_dd} {year} {time}', '%b %d %Y %H%M')
+    data = '{},{},{}'.format(stage, ts.date(), ts.time())
 
+    # grab last line of data file
+    datafile = os.path.join(outpath, gage.data_file())
+    with open(datafile, 'rt') as f:
+        for old_data in f:
+            pass
 
-def pull_val(text):
-    fields = text.split()
-    for i in range(len(fields)):
-        if fields[i] == 'value:':
-            try:
-                return (fields[i+1], fields[i+2], fields[i+3])
-            except IndexError as e:
-                return ('N/A', 'Gauge appears to be offline', '')
+    # If it's the same data point, don't do anything else
+    if old_data.strip() == data.strip():
+        return
+
+    if verbose:
+        print(f'\tWriting {data} to {datafile}')
+    with open(datafile, 'at') as out:
+        out.write(data+'\n')
+
+    raw_stages = []
+    raw_tss = []
+    with open(datafile, 'rt') as f:
+        for line in f:
+            fields = line.strip().split(',')
+            raw_stages.append(fields[0])
+            ts = dt.strptime(f'{fields[1]} {fields[2]}', '%Y-%m-%d %H:%M:%S')
+            raw_tss.append(ts)
+
+    make_graph(raw_stages, raw_tss, outpath, gage)
+#2.8,2022-05-25,07:00:00
+#3.2,2022-05-27,07:00:00
+#3.1,2022-05-28,07:00:00
+#3.8,2022-05-30,07:00:00
+#3.4,2022-05-31,07:00:00
+#3.4,2022-05-31,07:00:00
 
 
 def main():
