@@ -177,7 +177,7 @@ def get_prr_gage(gage, outpath, verbose=False):
 
     mmm_dd = meta[0]
     year = meta[1].strip().split(' ')[0]
-    ts = dt.strptime(f'{mmm_dd} {year} {time}', '%b %d %Y %H%M')
+    ts = dt.strptime(f'{mmm_dd} {year} {time}', '%B %d %Y %H%M')
     data = '{},{},{}'.format(stage, ts.date(), ts.time())
 
     # grab last line of data file
