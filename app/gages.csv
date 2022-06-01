@@ -21,8 +21,11 @@ PLABAICO,DWR,North Fork South Platte,Bailey,FR
 PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR
-# ---- South Boulder Creek 
-BOCPINCO,DWR,South Boulder Creek,Above Gross Res - Alto Alto,FR
+# ---- Boulder Creek 
+BOCPINCO,DWR,Boulder Creek,SB - Above Gross Res - Alto Alto,FR
+BOCBGRCO,DWR,Boulder Creek,SB - Below Gross Res - LSB,FR
+BOCOROCO,DWR,Boulder Creek,NB - Near Orodell,FR
+
 # ---- Big Thompson
 BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR
 # ---- Big South
