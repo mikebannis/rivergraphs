@@ -4,10 +4,10 @@ gage_id,type,river,location,region
 06719505,USGS,Clear Creek,Golden,FR
 CHUDITCO,DWR,Clear Creek,Church Ditch,FR
 # ----- Poudre
-PRR,PRR,Poudre Rock,da rock,FR
+PRR,PRR,Cache la Poudre,At The Rock,FR
 # --- Arkansas
 ARKGRNCO,DWR,Arkansas River,Granite,Ark
-07087050,USGS,Arkansas River,Numbers Putin,Ark
+07087050,USGS,Arkansas River,Numbers Put-in,Ark
 07091200,USGS,Arkansas River,Browns/Nathrup,Ark
 07094500,USGS,Arkansas River,Parkdale,Ark
 # ---- Arkansas River Headwaters
