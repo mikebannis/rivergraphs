@@ -200,7 +200,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     with open(datafile, 'rt') as f:
         for line in f:
             fields = line.strip().split(',')
-            raw_stages.append(fields[0])
+            raw_stages.append(float(fields[0]))
             ts = dt.strptime(f'{fields[1]} {fields[2]}', '%Y-%m-%d %H:%M:%S')
             raw_tss.append(ts)
 
