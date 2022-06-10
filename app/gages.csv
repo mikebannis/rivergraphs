@@ -24,9 +24,10 @@ PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR
 # ---- Boulder Creek 
-BOCPINCO,DWR,Boulder Creek,SB - Above Gross Res - Alto Alto,FR
-BOCBGRCO,DWR,Boulder Creek,SB - Below Gross Res - LSB,FR
-BOCOROCO,DWR,Boulder Creek,NB - Near Orodell,FR
+BOCPINCO,DWR,Boulder Creek,South Boulder - Above Gross Res - Alto Alto,FR
+BOCBGRCO,DWR,Boulder Creek,South Boulder - Below Gross Res - LSB,FR
+BOCELSCO,DWR,Boulder Creek,South Boulder - near Eldorado,FR
+BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR
 
 # ---- Big Thompson
 BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR
@@ -49,6 +50,7 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR
 09361500,USGS,Animas River,Durango,Durango
 09349800,USGS,Piedra,Near Arboles CO,Durango
 # -- multiday stuff
+13309220,USGS,Middle Fork Salmon,MF Lodge,Multi
 09163500,USGS,Colorado River,State Line - Westwater,Multi
 09234500,USGS,Green River,Greendale UT - Gates of Lodore,Multi
 09315000,USGS,Green River,Green River UT - Deso-Grey,Multi

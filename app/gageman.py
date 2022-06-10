@@ -30,6 +30,8 @@ class Gage(object):
     def units(self):
         if self.gage_type == 'PRR':
             return 'feet'
+        elif self.gage_id == '13309220':
+            return 'feet'
         else:
             return 'cfs'
 
@@ -106,7 +108,7 @@ class Gage(object):
         """
         Round stage or discharge appropriately
         """
-        if self.gage_type != 'PRR':
+        if self.gage_type != 'PRR' and self.gage_id != '13309220':
             return int(val)
         return val
 

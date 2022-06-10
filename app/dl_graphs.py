@@ -108,11 +108,16 @@ def get_usgs_gage(gage, outpath):
         raise URLError(response.status_code, response.text)
 
     soup = BeautifulSoup(response.text, 'html.parser')
+    
+    if gage.gage_id == 13309220:  # Middle fork
+        srch = 'Discharge, cubic feet per second'
+    else:
+        srch = 'Gage height, feet'
 
     # Get the discharge
     for tag in soup.find_all('a'):
         if tag.get('name') == "gifno-99":
-            if tag.getText().strip() == 'Discharge, cubic feet per second':
+            if tag.getText().strip() == srch:
                 parent = tag.parent
 
                 # Grab the graph and save it
@@ -156,6 +161,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
+    # TODO - look for urllib3.exceptions.NewConnectionError
     response = requests.get(gage.data_url())
 
     # Verify we got good stuff back
