@@ -94,12 +94,13 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     plt.close()
 
 
-def get_usgs_gage(gage, outpath):
+def get_usgs_gage(gage, outpath, verbose=False):
     """
     Grabs default flow graph for USGS Gage 'gage' and write image to outfile.
 
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
+    param: {bool} verbose - print debug text if True
     """
     response = requests.get(gage.data_url())
 
@@ -109,15 +110,19 @@ def get_usgs_gage(gage, outpath):
 
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    if gage.gage_id == 13309220:  # Middle fork
-        srch = 'Discharge, cubic feet per second'
+    if gage.gage_id != '13309220':  # Middle fork
+        search = 'Discharge, cubic feet per second'
     else:
-        srch = 'Gage height, feet'
+        search = 'Gage height, feet'
+
+    if verbose:
+        print(f'\tlooking for {search}')
+
 
     # Get the discharge
     for tag in soup.find_all('a'):
         if tag.get('name') == "gifno-99":
-            if tag.getText().strip() == srch:
+            if tag.getText().strip() == search:
                 parent = tag.parent
 
                 # Grab the graph and save it
@@ -135,8 +140,10 @@ def get_usgs_gage(gage, outpath):
                 # Grab the discharge and save it to a .cfs file
                 _next = parent.next_sibling
                 q = pull_val(_next)
+                if verbose:
+                    print(f'\tgot: {", ".join(q)}')
+
                 q_outfile = os.path.join(outpath, gage.data_file())
-                #print (q_out)
                 with open(q_outfile, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
@@ -244,33 +251,47 @@ def main():
 
         if gage.gage_type == 'USGS':
             try:
-                get_usgs_gage(gage, outpath)
+                get_usgs_gage(gage, outpath, verbose=verbose)
             except FailedImageAddr:
                 try:
                     if verbose:
                         print ('\tno image address, trying again...')
                     time.sleep(SLEEP)
-                    get_usgs_gage(gage, outpath)
+                    get_usgs_gage(gage, outpath, verbose=verbose)
                 except FailedImageAddr:
                     if verbose:
                         print ('\tfailed to download gage, skipping')
                     continue
+            except Exception as e:
+                print('\tERROR:', e)
+                continue
+
             if verbose:
                 print ('\tsuccess')
 
         elif gage.gage_type == 'DWR':
-            get_dwr_graph(gage, outpath, verbose=verbose)
+            try:
+                get_dwr_graph(gage, outpath, verbose=verbose)
+            except Exception as e:
+                print('\tERROR:', e)
+                continue
+
             if verbose:
                 print ('\tsuccess')
 
         elif gage.gage_type == 'PRR':
-            get_prr_gage(gage, outpath, verbose=verbose)
+            try:
+                get_prr_gage(gage, outpath, verbose=verbose)
+            except Exception as e:
+                print('\tERROR:', e)
+                continue
+
             if verbose:
                 print ('\tsuccess')
 
         else:
-            raise AttributeError('gage was returned from get_gages() that is '
-                                 'unknown')
+            print(f'ERROR: unknown gage type "{gage.gage_type}"')
+
         time.sleep(SLEEP)
 
 
