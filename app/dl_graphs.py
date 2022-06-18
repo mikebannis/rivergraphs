@@ -39,7 +39,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
         raise URLError(response.status_code, response.text)
 
     last_result = response.json()['ResultList'][-1]
-    if last_result['measUnit'] != 'cfs':
+    if last_result['measUnit'] not in ['cfs', 'ACFT']:
         raise ValueError('Wrong unit type in last result: ' + str(last_result))
 
     q = last_result['measValue']
@@ -147,6 +147,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
                 with open(q_outfile, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
+                    out.write('\n')
 
 
 def pull_val(text):
@@ -242,6 +243,8 @@ def main():
             gages = [g for g in gages if g.gage_type == 'PRR']
         elif sys.argv[1].lower() == 'reverse':
             gages = gages[::-1]
+        elif sys.argv[1].lower() == '--id':
+            gages = [g for g in gages if g.gage_id == sys.argv[2]]
 
     outpath = util.static_dir()
 

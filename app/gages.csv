@@ -29,6 +29,10 @@ BOCBGRCO,DWR,Boulder Creek,South Boulder - Below Gross Res - LSB,FR
 BOCELSCO,DWR,Boulder Creek,South Boulder - near Eldorado,FR
 BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR
 
+# St Vrain
+NSVBBRCO,DWR,Saint Vrain,NSV - Proving Grounds,FR
+BRKDAMCO,DWR,Saint Vrain,Button Rock Res,FR
+
 # ---- Big Thompson
 BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR
 # ---- Big South

@@ -30,8 +30,14 @@ class Gage(object):
     def units(self):
         if self.gage_type == 'PRR':
             return 'feet'
-        elif self.gage_id == '13309220':
+        elif self.gage_id in [
+                '13309220',  # Middle Fork
+                ]:
             return 'feet'
+        elif self.gage_id in [
+                'BRKDAMCO'  # Button rock res, NSV
+                ]:
+            return 'ac-ft'
         else:
             return 'cfs'
 
@@ -61,9 +67,10 @@ class Gage(object):
             return 'http://www.poudrerockreport.com/'
         else:
             # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
+            param = 'STORAGE' if self.gage_id == 'BRKDAMCO' else 'DISCHRG'
             return 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
                     'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
-                    f'{self.gage_id}&parameter=DISCHRG'
+                    f'{self.gage_id}&parameter={param}'
 
     def url(self):
         """ Return URL to human readable USGS or DWR gage page """
