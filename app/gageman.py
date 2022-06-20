@@ -1,7 +1,11 @@
 import csv
-from collections import defaultdict
-import os.path
 import util
+import os.path
+import pandas as pd
+from collections import defaultdict
+from pandas.plotting import register_matplotlib_converters
+
+register_matplotlib_converters()
 
 
 class Gage(object):
@@ -17,14 +21,22 @@ class Gage(object):
         self.location = location  # location of gage (string)
         self.region = region  # region the gage is located in (FR, Ark, etc)
 
-        self.q = None  # most recent discharge
-        self.q_date = None  # date of most recent discharge
-        self.q_time = None  # tiem of most recent discharge
-        self._get_q()  # Get values for q, q_date, & q_time
+        self.q, self.q_date, self.q_time = self._get_q()
 
-        if gage_type not in ['USGS', 'DWR', 'PRR']:
-            raise AttributeError('gage_type must be USGS, PRR, or DWR, was '
+        gage_types = ['USGS', 'DWR', 'PRR', 'VIRTUAL']
+        if gage_type not in gage_types:
+            raise AttributeError(f'gage_type must be {", ".join(gage_types)} '
                                  f'passed {gage_type}')
+
+    @property
+    def series(self):
+        """ Get all data as pd.Series indexed by datetime """
+        q_file = os.path.join(util.static_dir(), self.data_file())
+        df = pd.read_csv(q_file, names=['value', 'date', 'time'])
+        df['dt'] = df.date + ' ' + df.time
+        df.dt = pd.to_datetime(df.dt, format='%Y-%m-%d %H:%M:%S')
+        df.index = df.dt
+        return df.value
 
     @property
     def units(self):
@@ -89,27 +101,33 @@ class Gage(object):
         q_file = os.path.join(util.static_dir(), self.data_file())
         if not os.path.isfile(q_file):
             print(f'Gage data file {q_file} not found')
-            return
+            return 9999, 9999, 9999
 
         # Grab last line from gage data file
         with open(q_file, 'rt') as infile:
             for data in infile:
                 pass
 
-        fields = data.strip().split(',')
+        try:
+            fields = data.strip().split(',')
+        except UnboundLocalError:
+                return 666, 666, 666
+
         try:
             if self._is_float(fields[0]):
-                self.q = self.round_val(float(fields[0]))
+                q = self.round_val(float(fields[0]))
             else:
-                self.q = 'Error'
-            self.q_date = fields[1]
-            self.q_time = fields[2]
+                q = 'Error'
+            q_date = fields[1]
+            q_time = fields[2]
         except IndexError:
             print('Error getting data for {}, fields: {}'.format(self.gage_id,
                                                                  fields))
-            self.q = 9999
-            self.q_date = 9999
-            self.q_time = 9999
+            q = 9999
+            q_date = 9999
+            q_time = 9999
+
+        return q, q_date, q_time
 
     def round_val(self, val):
         """
@@ -146,6 +164,23 @@ def get_gages():
                              row['location'], row['region'])
             gages.append(temp_gage)
     return gages
+
+
+def get_gage(id, _type):
+    """
+    Load individual gage from file
+
+    @returns {Gage}
+    """
+    gages = []
+    with open(util.gages_file(), 'rt') as infile:
+        rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
+        for row in rdr:
+            if row['gage_id'] == id and row['type'] == _type:
+                gage = Gage(row['gage_id'], row['type'], row['river'],
+                            row['location'], row['region'])
+                return gage
+    raise ValueError('Gage not found')
 
 
 def get_rivers(gages):

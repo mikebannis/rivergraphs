@@ -24,10 +24,10 @@ PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR
 # ---- Boulder Creek 
+BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR
 BOCPINCO,DWR,Boulder Creek,South Boulder - Above Gross Res - Alto Alto,FR
 BOCBGRCO,DWR,Boulder Creek,South Boulder - Below Gross Res - LSB,FR
 BOCELSCO,DWR,Boulder Creek,South Boulder - near Eldorado,FR
-BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR
 
 # St Vrain
 NSVBBRCO,DWR,Saint Vrain,NSV - Proving Grounds,FR
@@ -72,3 +72,6 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR
 03076500,USGS,Upper Youghiogheny,Friendsville. MD,WV
 03187500,USGS,Cranberry River,Near Richwood,WV
 03057000,USGS,Tygart Valley River,Colfax,WV
+
+# Virtual gages, these should be at the end
+NSV,VIRTUAL,Saint Vrain,NSV - Above Button Rock,FR

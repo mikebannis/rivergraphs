@@ -17,6 +17,7 @@ import util
 
 
 SLEEP = 5  # seconds between pulling gages
+PLOT_DAYS = 7  # Days to plot on graph
 
 
 class URLError(Exception):
@@ -37,34 +38,33 @@ def get_dwr_graph(gage, outpath, verbose=False):
     response = requests.get(gage.data_url())
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
-
-    last_result = response.json()['ResultList'][-1]
-    if last_result['measUnit'] not in ['cfs', 'ACFT']:
-        raise ValueError('Wrong unit type in last result: ' + str(last_result))
-
-    q = last_result['measValue']
-    timestamp = last_result['measDateTime']
-    date = timestamp.split('T')[0]
-    time = timestamp.split('T')[1]
+    results = response.json()['ResultList']
 
     outfile = os.path.join(outpath, gage.data_file())
     with open(outfile, 'wt') as out:
-        data = '{},{},{}'.format(q, date, time)
-        if verbose:
-            print(f'\tWriting {data} to {outfile}')
-        out.write(data+'\n')
+        for result in results:
+            q = result['measValue']
+            timestamp = result['measDateTime']
+            date = timestamp.split('T')[0]
+            time = timestamp.split('T')[1]
+
+            data = f'{q},{date},{time}'
+            out.write(data+'\n')
+
+    if verbose:
+        print(f'\tWrote {len(results)} results to {outfile}')
+        print(f'\tLast result was {data}')
 
     # --- Plot and save the hydrograph
     date_f = '%Y-%m-%dT%H:%M:%S'
-    raw_qs = [r['measValue'] for r in response.json()['ResultList']]
-    raw_tss = [dt.strptime(r['measDateTime'], date_f) for r in
-               response.json()['ResultList']]
+    raw_qs = [r['measValue'] for r in results]
+    raw_tss = [dt.strptime(r['measDateTime'], date_f) for r in results]
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
 def make_graph(raw_qs, raw_tss, outpath, gage):
     """
-    Make a hyrograph and save it
+    Make a hydro graph and save it
 
     @param {list of float} raw_qs - list of discharges or stages
     @param {list of Datetime} raw_tss - time stamps for readings
@@ -74,7 +74,7 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     # only show last 7 days
     qs = []
     tss = []
-    delta = timedelta(days=7)
+    delta = timedelta(days=PLOT_DAYS)
     for q, ts in zip(raw_qs, raw_tss):
         if raw_tss[-1] - ts > delta:
             continue
@@ -84,7 +84,6 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     i_outfile = os.path.join(outpath, gage.image_file())
 
     fmt = mdates.DateFormatter('%b\n%d')  # May\n5
-    #fig, ax = plt.subplots(1, figsize=(6.4, 4.1), dpi=100)
     fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
     ax.plot(tss, qs)
     ax.set_ylim(ymin=0)
@@ -109,7 +108,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
         raise URLError(response.status_code, response.text)
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    
+
     if gage.gage_id != '13309220':  # Middle fork
         search = 'Discharge, cubic feet per second'
     else:
@@ -160,6 +159,39 @@ def pull_val(text):
             except IndexError:
                 return ('N/A', 'Gauge appears to be offline', '')
 
+def get_nsv_gage(gage, outpath, verbose=False):
+    """
+    Determine NSV flow above button rock by determining rate of change of
+    volume in button rock and adding to discharge downstream. Assume 1 cfs ==
+    1/12 ac-ft/hr
+    """
+    import pandas as pd
+
+    # Proving grounds q - find average flow per hour
+    pgq_g = gageman.get_gage('NSVBBRCO', 'DWR')
+    pgq = pgq_g.series.groupby(pd.Grouper(freq='H')).mean()
+
+    # Button rock dam af-ft
+    braf_g = gageman.get_gage('BRKDAMCO', 'DWR')
+    # This probably doesn't need to be averaged, but doesn't really hurt either
+    braf = braf_g.series.groupby(pd.Grouper(freq='H')).mean()
+
+    # Calculate approx inflow
+    nsvq = braf.diff()*12 + pgq
+
+    # clip to last 7 days and chop off fake peaks
+    mask = nsvq.index > dt.today() - timedelta(days=PLOT_DAYS)
+    nsvq = nsvq[mask]
+    nsvq = nsvq[nsvq < nsvq.median() * 4]
+
+    make_graph(nsvq.values, nsvq.index, outpath, gage)
+
+    datafile = os.path.join(outpath, gage.data_file())
+    with open(datafile, 'wt') as f:
+        date = nsvq.index[-1].strftime('%Y-%m-%d')
+        time = nsvq.index[-1].strftime('%H:%M:%S')
+        f.write(f'{nsvq[-1]},{date},{time}\n')
+
 
 def get_prr_gage(gage, outpath, verbose=False):
     """
@@ -194,15 +226,16 @@ def get_prr_gage(gage, outpath, verbose=False):
     ts = dt.strptime(f'{mmm_dd} {year} {time}', '%B %d %Y %H%M')
     data = '{},{},{}'.format(stage, ts.date(), ts.time())
 
-    # grab last line of data file
+    # grab last line of data file if it exists
     datafile = os.path.join(outpath, gage.data_file())
-    with open(datafile, 'rt') as f:
-        for old_data in f:
-            pass
+    if os.path.exists(datafile):
+        with open(datafile, 'rt') as f:
+            for old_data in f:
+                pass
 
-    # If it's the same data point, don't do anything else
-    if old_data.strip() == data.strip():
-        return
+        # If it's the same data point, don't do anything else
+        if old_data.strip() == data.strip():
+            return
 
     if verbose:
         print(f'\tWriting {data} to {datafile}')
@@ -228,13 +261,13 @@ def get_prr_gage(gage, outpath, verbose=False):
 
 
 def main():
-    gages = gageman.get_gages()
-    # print(f'Downloading {len(gages)} gages')
-    # print(os.getcwd())
-
     verbose = False
-    if len(sys.argv) > 1:
+
+    if len(sys.argv) == 1:
+        gages = gageman.get_gages()
+    elif len(sys.argv) == 2:
         verbose = True
+        gages = gageman.get_gages()
         if sys.argv[1].lower() == 'dwr':
             gages = [g for g in gages if g.gage_type == 'DWR']
         elif sys.argv[1].lower() == 'usgs':
@@ -243,12 +276,25 @@ def main():
             gages = [g for g in gages if g.gage_type == 'PRR']
         elif sys.argv[1].lower() == 'reverse':
             gages = gages[::-1]
-        elif sys.argv[1].lower() == '--id':
+    elif len(sys.argv) == 3:
+        verbose = True
+        if sys.argv[1].lower() == '--id':
+            gages = gageman.get_gages()
             gages = [g for g in gages if g.gage_id == sys.argv[2]]
+        else:
+            print('This isn\'t valid:', sys.argv)
+            sys.exit()
+    else:
+        print('This isn\'t valid:', sys.argv)
+        sys.exit()
+
+    if len(gages) == 0:
+        print('No matching gages found!!!')
+        sys.exit()
 
     outpath = util.static_dir()
 
-    for gage in gages:
+    for i, gage in enumerate(gages):
         if verbose:
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
@@ -266,7 +312,7 @@ def main():
                         print ('\tfailed to download gage, skipping')
                     continue
             except Exception as e:
-                print('\tERROR:', e)
+                print(f'\tError getting gage {gage}: {e}')
                 continue
 
             if verbose:
@@ -276,7 +322,7 @@ def main():
             try:
                 get_dwr_graph(gage, outpath, verbose=verbose)
             except Exception as e:
-                print('\tERROR:', e)
+                print(f'\tError getting gage {gage}: {e}')
                 continue
 
             if verbose:
@@ -286,16 +332,27 @@ def main():
             try:
                 get_prr_gage(gage, outpath, verbose=verbose)
             except Exception as e:
-                print('\tERROR:', e)
+                print(f'\tError getting gage {gage}: {e}')
+                continue
+
+            if verbose:
+                print ('\tsuccess')
+
+        elif gage.gage_type == 'VIRTUAL' and gage.gage_id =='NSV':
+            try:
+                get_nsv_gage(gage, outpath, verbose=verbose)
+            except Exception as e:
+                print('\tError getting nsv gage:', e)
                 continue
 
             if verbose:
                 print ('\tsuccess')
 
         else:
-            print(f'ERROR: unknown gage type "{gage.gage_type}"')
+            print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
 
-        time.sleep(SLEEP)
+        if i + 1 < len(gages):
+            time.sleep(SLEEP)
 
 
 if __name__ == '__main__':
