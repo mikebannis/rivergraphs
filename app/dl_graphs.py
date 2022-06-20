@@ -85,6 +85,10 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
 
     fmt = mdates.DateFormatter('%b\n%d')  # May\n5
     fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
+
+    if len(qs) == 0 or len(tss) == 0:
+        raise ValueError(f'No data to plot for {gage}')
+
     ax.plot(tss, qs)
     ax.set_ylim(ymin=0)
     ax.xaxis.set_major_formatter(fmt)

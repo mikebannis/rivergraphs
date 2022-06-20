@@ -2,10 +2,11 @@ import csv
 import util
 import os.path
 import pandas as pd
+# import matplotlib
 from collections import defaultdict
-from pandas.plotting import register_matplotlib_converters
+#from pandas.plotting import register_matplotlib_converters
 
-register_matplotlib_converters()
+#register_matplotlib_converters()
 
 
 class Gage(object):
