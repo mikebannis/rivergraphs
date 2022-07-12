@@ -11,16 +11,19 @@ ARKGRNCO,DWR,Arkansas River,Granite,Ark
 07091200,USGS,Arkansas River,Browns/Nathrup,Ark
 07094500,USGS,Arkansas River,Parkdale,Ark
 # ---- Arkansas River Headwaters
+LAKATLCO,DWR,Lake Creek,Lake Creek Above Twin Lakes Reservoir,Ark
+TWITUNCO,DWR,Lake Creek,Twin Lakes Tunnel,Ark
+LAKBTLCO,DWR,Lake Creek,Lake Creek Below Twin Lakes Reservoir,Ark
 07083710,USGS,Arkansas Headwaters,Arkansas Near Malta,Ark
 CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark
 #CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
-LAKBTLCO,DWR,Arkansas Headwaters,Lake Creek Below Twin Lakes Reservoir,Ark
 # ---- Bailey 
 ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR
 #PLAGRACO,DWR,North Fork South Platte,Grant Gage,FR
 PLABAICO,DWR,North Fork South Platte,Bailey,FR
 # ---- South Fork of the South Platte
 PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
+PLABRUCO,DWR,South Fork South Platte,Chutes (Deckers),FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR
 # ---- Boulder Creek 
@@ -48,6 +51,8 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR
 # -- crested butte area
 09112200,USGS,Upper East,Below Cement Creek,Central
 385106106571000,USGS,Slate River,Near Crested Butte,Central
+09128000,USGS,Gunnison River,Black Canyon,Central
+
 # ------- Durango
 09359020,USGS,Animas River,Below Silverton,Durango
 09359500,USGS,Animas River,Tacoma,Durango
