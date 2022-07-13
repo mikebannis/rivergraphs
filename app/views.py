@@ -67,3 +67,9 @@ def wv():
     rivers = gageman.get_rivers(gages)
     return render_template('flows.html', rivers=rivers)
 
+@app.route('/wyoming')
+def wyoming():
+    gages = gageman.get_gages()
+    gages = [g for g in gages if g.region == 'WY']
+    rivers = gageman.get_rivers(gages)
+    return render_template('flows.html', rivers=rivers)
