@@ -23,7 +23,7 @@ ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR
 PLABAICO,DWR,North Fork South Platte,Bailey,FR
 # ---- South Fork of the South Platte
 PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR
-PLABRUCO,DWR,South Fork South Platte,Chutes (Deckers),FR
+#PLABRUCO,DWR,South Fork South Platte,Chutes (Deckers),FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR
 # ---- Boulder Creek 
@@ -77,6 +77,9 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR
 03076500,USGS,Upper Youghiogheny,Friendsville. MD,WV
 03187500,USGS,Cranberry River,Near Richwood,WV
 03057000,USGS,Tygart Valley River,Colfax,WV
+
+# WY
+4578,WYSEO,Wheatland Tunnel,Blue Grass Creek,WY
 
 # Virtual gages, these should be at the end
 NSV,VIRTUAL,Saint Vrain,NSV - Above Button Rock,FR

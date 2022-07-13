@@ -24,7 +24,7 @@ class Gage(object):
 
         self.q, self.q_date, self.q_time = self._get_q()
 
-        gage_types = ['USGS', 'DWR', 'PRR', 'VIRTUAL']
+        gage_types = ['USGS', 'DWR', 'PRR', 'WYSEO', 'VIRTUAL']
         if gage_type not in gage_types:
             raise AttributeError(f'gage_type must be {", ".join(gage_types)} '
                                  f'passed {gage_type}')
@@ -78,12 +78,14 @@ class Gage(object):
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         elif self.gage_type == 'PRR':
             return 'http://www.poudrerockreport.com/'
-        else:
+        elif self.gage_type == 'DWR':
             # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
             param = 'STORAGE' if self.gage_id == 'BRKDAMCO' else 'DISCHRG'
             return 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
                     'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
                     f'{self.gage_id}&parameter={param}'
+        else:
+            return f'Data URL not known for {self.gage_id} {self.gage_type}'
 
     def url(self):
         """ Return URL to human readable USGS or DWR gage page """
@@ -91,8 +93,12 @@ class Gage(object):
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         elif self.gage_type == 'PRR':
             return 'http://www.poudrerockreport.com/'
-        else:
+        elif self.gage_type == 'WYSEO':
+            return 'https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Monthly/'
+        elif self.gage_type == 'DWR':
             return f'https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG'
+        else:
+            return f'Human URL not known for {self.gage_id} {self.gage_type}'
 
     def _get_q(self):
         """

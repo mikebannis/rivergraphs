@@ -4,17 +4,20 @@ from __future__ import print_function
 import os
 import sys
 import time
+import pytz
 import shutil
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime as dt
 from datetime import timedelta
+from datetime import datetime as dt
 import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
+from pandas.plotting import register_matplotlib_converters
 
 import gageman
 import util
 
+register_matplotlib_converters()
 
 SLEEP = 5  # seconds between pulling gages
 PLOT_DAYS = 7  # Days to plot on graph
@@ -26,6 +29,62 @@ class URLError(Exception):
 
 class FailedImageAddr(Exception):
     pass
+
+
+def get_wyseo_gage(gage, outpath, verbose=False):
+    """
+    Grabs default flow graph for WY State Engineers Office
+    e.g. https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Custom/2022/07/01/2022/08/01
+
+    param: gage - gageman.Gage instance
+    prarm: outpath - path to output dir
+    """
+    assert gage.gage_id == '4578', 'This only works for blue grass...'
+
+    utc = pytz.timezone('UTC')
+    mtn = pytz.timezone('US/Mountain')
+    date_f = '%Y-%m-%dT%H:%M:%SZ'
+
+    start = (dt.now() - timedelta(days=PLOT_DAYS+1)).strftime('%Y-%m-%d')
+    end = (dt.now() + timedelta(days=2)).strftime('%Y-%m-%d')
+    if verbose:
+        print(f'Getting data for {gage.gage_id} from {start} to {end}')
+
+    data = {
+        'sort': 'TimeStamp-asc',
+        'date': start,
+        'endDate': end,
+    }
+    response = requests.post(
+        'https://seoflow.wyo.gov/Data/DatasetGrid?dataset=4578',
+        data=data
+    )
+
+    if response.status_code != 200:
+        raise URLError(response.status_code, response.text)
+    results = response.json()['Data']
+
+    outfile = os.path.join(outpath, gage.data_file())
+    with open(outfile, 'wt') as out:
+        for result in results:
+            q = result['Value']
+            timestamp = utc.localize(dt.strptime(result['TimeStamp'], date_f))
+            timestamp = timestamp.astimezone(mtn)
+            timestamp_str = timestamp.strftime('%Y-%m-%d,%H:%M:%S')
+            data = f'{q},{timestamp_str}\n'
+            out.write(data)
+
+    if verbose:
+        print(f'\tWrote {len(results)} results to {outfile}')
+        print(f'\tLast result was {data}')
+
+    # --- Plot and save the hydrograph
+    raw_qs = [r['Value'] for r in results]
+    raw_tss = [
+        utc.localize(dt.strptime(r['TimeStamp'], date_f)).astimezone(mtn)
+        for r in results
+    ]
+    make_graph(raw_qs, raw_tss, outpath, gage)
 
 
 def get_dwr_graph(gage, outpath, verbose=False):
@@ -335,6 +394,16 @@ def main():
         elif gage.gage_type == 'PRR':
             try:
                 get_prr_gage(gage, outpath, verbose=verbose)
+            except Exception as e:
+                print(f'\tError getting gage {gage}: {e}')
+                continue
+
+            if verbose:
+                print ('\tsuccess')
+
+        elif gage.gage_type == 'WYSEO':
+            try:
+                get_wyseo_gage(gage, outpath, verbose=verbose)
             except Exception as e:
                 print(f'\tError getting gage {gage}: {e}')
                 continue
