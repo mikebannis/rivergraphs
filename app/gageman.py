@@ -14,13 +14,16 @@ class Gage(object):
     Information pertaining to a DWR or USGS gage, and methods returning graph
     image and URL to the actual gage
     """
-    def __init__(self, gage_id, gage_type, river, location, region):
+    def __init__(self, gage_id, gage_type, river, location, region, units=None):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
                                 # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
         self.river = river  # name of river/creek (string)
         self.location = location  # location of gage (string)
         self.region = region  # region the gage is located in (FR, Ark, etc)
+        if units is None:
+            units = 'cfs'
+        self.units = units # cfs, feet, or ac-ft
 
         self.q, self.q_date, self.q_time = self._get_q()
 
@@ -38,21 +41,6 @@ class Gage(object):
         df.dt = pd.to_datetime(df.dt, format='%Y-%m-%d %H:%M:%S')
         df.index = df.dt
         return df.value
-
-    @property
-    def units(self):
-        if self.gage_type == 'PRR':
-            return 'feet'
-        elif self.gage_id in [
-                '13309220',  # Middle Fork
-                ]:
-            return 'feet'
-        elif self.gage_id in [
-                'BRKDAMCO'  # Button rock res, NSV
-                ]:
-            return 'ac-ft'
-        else:
-            return 'cfs'
 
     def image_file(self):
         """ Return file name for gage image"""
@@ -140,7 +128,7 @@ class Gage(object):
         """
         Round stage or discharge appropriately
         """
-        if self.gage_type != 'PRR' and self.gage_id != '13309220':
+        if self.units == 'cfs' or self.units == 'ac-ft':
             return int(val)
         return val
 
@@ -168,7 +156,7 @@ def get_gages():
         rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
         for row in rdr:
             temp_gage = Gage(row['gage_id'], row['type'], row['river'],
-                             row['location'], row['region'])
+                             row['location'], row['region'], units=row['units'])
             gages.append(temp_gage)
     return gages
 

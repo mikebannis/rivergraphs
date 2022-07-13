@@ -172,10 +172,13 @@ def get_usgs_gage(gage, outpath, verbose=False):
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    if gage.gage_id != '13309220':  # Middle fork
+    if gage.units == 'cfs':
         search = 'Discharge, cubic feet per second'
-    else:
+    elif gage.units == 'feet':
         search = 'Gage height, feet'
+    else:
+        raise ValueError('Units for USGS gage must be cfs or feet. Received '
+                         f'{gage.units} for {gage}')
 
     if verbose:
         print(f'\tlooking for {search}')
