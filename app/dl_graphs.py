@@ -279,7 +279,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     try:
         # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
         header = soup.find(class_='entry-header')
-        stage = header.find('a').getText().split(' ')[2]
+        stage = header.find('a').getText().split(' ')[2].replace('+', '').replace('-', '')
         time = header.find('a').getText().split(' ')[4]
         # Get date, e.g. 'May 31, 2022 By Camp Falbo '
         meta = header.find('p').getText().split(',')
