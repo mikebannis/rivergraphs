@@ -1,0 +1,35 @@
+<!--
+  River flows and gages for favorite gages, not grouped by river
+-->
+{% extends "base.html" %}
+{% block content %}
+    <h1> Your Favorite Gages </h1>
+    <div class="row mb-0">
+    {% for river, gages in rivers.items() %}
+        {% for gage in gages %}
+            <div class="col-lg-6 col-xxl-4 mb-4">
+              <div class="row">
+                <h2> {{ river }} </h2>
+                <h4> 
+                  {% if gage.url() is not none %}
+                    <a id="{{ gage.gage_id }}" href="{{ gage.url() }}">
+                      {{ gage.location }}
+                    </a> &emsp; 
+                  {% else %}
+                      {{ gage.location }}
+                  {% endif %}
+                  <b>{{ gage.q }} {{ gage.units }} </b>
+                  <small>@ {{gage.q_time}} {{gage.q_date}}</small>
+                </h4> 
+              </div>
+
+              {% if gage.image_exists(): %}
+                <div class="row">
+                  <img src={{ url_for('static', filename=gage.image_file()) }}>
+                </div>
+              {% endif %}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    </div>
+{% endblock %}

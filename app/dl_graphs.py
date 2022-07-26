@@ -19,7 +19,8 @@ import util
 
 register_matplotlib_converters()
 
-SLEEP = 2  # seconds between pulling gages
+LONG_SLEEP = 3  # seconds between pulling gages when called by cron
+SHORT_SLEEP = 0.1  # seconds between pulling gages when called by user
 PLOT_DAYS = 7  # Days to plot on graph
 
 # Extra room at top of custom hydrographs. 1.05 -> 5% extra room above max
@@ -442,6 +443,7 @@ def main():
         sys.exit()
 
     outpath = util.static_dir()
+    sleep = SHORT_SLEEP if verbose else LONG_SLEEP
 
     for i, gage in enumerate(gages):
         if verbose:
@@ -454,7 +456,7 @@ def main():
                 try:
                     if verbose:
                         print ('\tno image address, trying again...')
-                    time.sleep(SLEEP)
+                    time.sleep(sleep)
                     get_usgs_gage(gage, outpath, verbose=verbose)
                 except FailedImageAddr:
                     if verbose:
@@ -521,7 +523,7 @@ def main():
             print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
 
         if i + 1 < len(gages):
-            time.sleep(SLEEP)
+            time.sleep(sleep)
 
 
 if __name__ == '__main__':

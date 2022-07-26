@@ -1,15 +1,57 @@
-from flask import render_template, url_for
-from collections import defaultdict
-from app import app
+import json
 import sys, os
+from collections import defaultdict
+from flask import render_template, url_for, make_response, request
 sys.path.append(os.path.dirname(__file__))
+
 import gageman
+from app import app
 
+DEFAULT_FAVORITES = {
+    'version':  0.02,
+    'gages': [
+        { 'type': 'DWR', 'id': 'PLABAICO'},  # Bailey
+        { 'type': 'DWR', 'id': 'BTBLESCO'},  # Big Thompson
+        { 'type': 'USGS', 'id': '09128000'},  # Black canyon
+        { 'type': 'USGS', 'id': '06719505'},  # Black Rock
 
-#@app.route('/')
-#@app.route('/index')
-#def index():
-#    return render_template('index.html')
+        { 'type': 'VIRTUAL', 'id': 'WILDCAT'},
+        { 'type': 'WYSEO', 'id': '4578'},  # Blue grass
+        { 'type': 'USGS', 'id': '09352900'},  # Vallecito
+        { 'type': 'USGS', 'id': '09058000'},  # Gore
+    ]
+}
+
+CURRENT_FAVS_VER = 0.02
+
+def get_favorite_gages():
+    """
+    Get users favorite gages from cookie. See DEFAULT_FAVORITES for cookie
+    format.
+
+    @returns {list of Gage, bool} gages, bad_cookie - List of favorite gages,
+        True if cookie is missing or out of date
+    """
+    bad_cookie = False
+    if 'favorites' in request.cookies:
+        favs = json.loads(request.cookies['favorites'])
+    else:
+        favs = DEFAULT_FAVORITES
+        bad_cookie = True
+
+    if 'version' not in favs or float(favs['version']) != CURRENT_FAVS_VER:
+        favs = DEFAULT_FAVORITES
+        bad_cookie = True
+
+    try:
+        gages = [gageman.get_gage(_type=f['type'], _id=f['id']) for f in favs['gages']]
+    except ValueError:
+        bad_cookie = True
+        favs = DEFAULT_FAVORITES
+        gages = [gageman.get_gage(_type=f['type'], _id=f['id']) for f in favs['gages']]
+
+    return gages, bad_cookie
+
 
 @app.route('/snotel')
 def snotel():
@@ -19,11 +61,14 @@ def snotel():
 @app.route('/')
 @app.route('/index')
 def flows():
-    gages = gageman.get_gages()
+    gages, bad_cookie = get_favorite_gages()
     rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
-    # print( url_for('static', filename='06716500.gif'))
-    # return '<img src="'+url_for('static', filename='06716500.gif')+'">'
+
+    resp = make_response(render_template('favorite_flows.html', rivers=rivers))
+
+    if bad_cookie:
+        resp.set_cookie('favorites', json.dumps(DEFAULT_FAVORITES))
+    return resp
 
 @app.route('/arkansas')
 def arkansas():

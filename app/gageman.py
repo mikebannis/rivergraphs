@@ -162,21 +162,26 @@ def get_gages():
     return gages
 
 
-def get_gage(id, _type):
+def get_gage(_id=None, _type=None):
     """
     Load individual gage from file
 
+    @param {str} _id - id of gage
+    @param {str} _type - type of gage, e.g. 'USGS', 'DWR', etc
     @returns {Gage}
     """
+    if _id is None or _type is None:
+        raise AttributeError('Both _id and _type must be set')
+
     gages = []
     with open(util.gages_file(), 'rt') as infile:
         rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
         for row in rdr:
-            if row['gage_id'] == id and row['type'] == _type:
+            if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
                             row['location'], row['region'])
                 return gage
-    raise ValueError('Gage not found')
+    raise ValueError(f'Gage {_type} {_id} not found')
 
 
 def get_rivers(gages):
