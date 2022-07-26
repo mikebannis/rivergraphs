@@ -1,22 +1,12 @@
 gage_id,type,river,location,region,units
+
+######## Front Range  ##############################
 # ---- Clear Creek
 06716500,USGS,Clear Creek,Dumont,FR,cfs
 06719505,USGS,Clear Creek,Golden,FR,cfs
 CHUDITCO,DWR,Clear Creek,Church Ditch,FR,cfs
 # ----- Poudre
 PRR,PRR,Cache la Poudre,At The Rock,FR,feet
-# --- Arkansas
-ARKGRNCO,DWR,Arkansas River,Granite,Ark,cfs
-07087050,USGS,Arkansas River,Numbers Put-in,Ark,cfs
-07091200,USGS,Arkansas River,Browns/Nathrup,Ark,cfs
-07094500,USGS,Arkansas River,Parkdale,Ark,cfs
-# ---- Arkansas River Headwaters
-LAKATLCO,DWR,Lake Creek,Lake Creek Above Twin Lakes Reservoir,Ark,cfs
-TWITUNCO,DWR,Lake Creek,Twin Lakes Tunnel,Ark,cfs
-LAKBTLCO,DWR,Lake Creek,Lake Creek Below Twin Lakes Reservoir,Ark,cfs
-07083710,USGS,Arkansas Headwaters,Arkansas Near Malta,Ark,cfs
-CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
-#CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
 # ---- Bailey 
 ROBTUNCO,DWR,North Fork South Platte,Roberts Tunnel,FR,cfs
 #PLAGRACO,DWR,North Fork South Platte,Grant Gage,FR
@@ -27,7 +17,6 @@ PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR,cfs
 06701900,USGS,South Fork South Platte,Chutes (Deckers),FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR,cfs
-TARTARCO,DWR,Tarryall Creek,Below Tarryall Res.,FR,cfs
 # ---- Boulder Creek 
 BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR,cfs
 BOCPINCO,DWR,Boulder Creek,South Boulder - Above Gross Res - Alto Alto,FR,cfs
@@ -42,6 +31,24 @@ BRKDAMCO,DWR,Saint Vrain,Button Rock Res,FR,ac-ft
 BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR,cfs
 # ---- Big South
 LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR,cfs
+
+TARTARCO,DWR,Tarryall Creek,Below Tarryall Res.,FR,cfs
+
+######## Central Mountains ##############################
+# --- Arkansas
+ARKGRNCO,DWR,Arkansas River,Granite,Ark,cfs
+07087050,USGS,Arkansas River,Numbers Put-in,Ark,cfs
+07091200,USGS,Arkansas River,Browns/Nathrup,Ark,cfs
+07094500,USGS,Arkansas River,Parkdale,Ark,cfs
+# ---- Arkansas River Headwaters
+LAKATLCO,DWR,Lake Creek,Lake Creek Above Twin Lakes Reservoir,Ark,cfs
+TWITUNCO,DWR,Lake Creek,Twin Lakes Tunnel,Ark,cfs
+LAKBTLCO,DWR,Lake Creek,Lake Creek Below Twin Lakes Reservoir,Ark,cfs
+07083710,USGS,Arkansas Headwaters,Arkansas Near Malta,Ark,cfs
+CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
+#CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
+
+######## Central Mountains ##############################
 # --- Colorado River
 09058000,USGS,Colorado River,Kremmling - Gore,Central,cfs
 09070500,USGS,Colorado River,Dotsero - Glenwood Canyon,Central,cfs
@@ -55,12 +62,13 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR,cfs
 385106106571000,USGS,Slate River,Near Crested Butte,Central,cfs
 09128000,USGS,Gunnison River,Black Canyon,Central,cfs
 
-# ------- Durango
+########  Durango ##############################
 09352900,USGS,Vallecito Creek,Near Bayfield,Durango,feet
 09359020,USGS,Animas River,Below Silverton,Durango,cfs
 09359500,USGS,Animas River,Tacoma,Durango,cfs
 09361500,USGS,Animas River,Durango,Durango,cfs
 09349800,USGS,Piedra,Near Arboles CO,Durango,cfs
+
 # -- multiday stuff
 13309220,USGS,Middle Fork Salmon,MF Lodge,Multi,feet
 09163500,USGS,Colorado River,State Line - Westwater,Multi,cfs
@@ -87,3 +95,4 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR,cfs
 # Virtual gages, these should be at the end
 NSV,VIRTUAL,Saint Vrain,NSV - Above Button Rock,FR
 FOXTON,VIRTUAL,North Fork South Platte,Foxton,FR
+WILDCAT,VIRTUAL,South Fork South Platte,Wildcat Canyon,FR

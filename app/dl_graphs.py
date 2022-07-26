@@ -19,8 +19,11 @@ import util
 
 register_matplotlib_converters()
 
-SLEEP = 5  # seconds between pulling gages
+SLEEP = 2  # seconds between pulling gages
 PLOT_DAYS = 7  # Days to plot on graph
+
+# Extra room at top of custom hydrographs. 1.05 -> 5% extra room above max
+GRAPH_TOP_BUFFER = 1.05
 
 USGS_CODE = {
     'feet': '00065',
@@ -154,7 +157,7 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
         raise ValueError(f'No data to plot for {gage}')
 
     ax.plot(tss, qs)
-    ax.set_ylim(ymin=0)
+    ax.set_ylim(ymin=0, ymax=max(qs)*GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
     plt.savefig(i_outfile)
@@ -315,6 +318,31 @@ def get_foxton_gage(gage, outpath, verbose=False):
         f.write(f'{foxton[-1]},{date},{time}\n')
 
 
+def get_wildcat_gage(gage, outpath, verbose=False):
+    """
+    Determine wildcat gage as above cheesman - tarryall
+    """
+    import pandas as pd
+
+    cheesman = gageman.get_gage('06700000', 'USGS').series
+    tarryall = gageman.get_gage('TARTARCO', 'DWR').series
+    wildcat = (cheesman - tarryall).dropna()
+
+    if wildcat.size <= 0:
+        raise ValueError('No data points calculated for wildcat!')
+
+    # clip to last 7 days
+    mask = wildcat.index > dt.today() - timedelta(days=PLOT_DAYS)
+    wildcat = wildcat[mask]
+
+    make_graph(wildcat.values, wildcat.index, outpath, gage)
+
+    datafile = os.path.join(outpath, gage.data_file())
+    with open(datafile, 'wt') as f:
+        date = wildcat.index[-1].strftime('%Y-%m-%d')
+        time = wildcat.index[-1].strftime('%H:%M:%S')
+        f.write(f'{wildcat[-1]},{date},{time}\n')
+
 def get_prr_gage(gage, outpath, verbose=False):
     """
     Grabs default flow graph for the Poudre rock report and write image to
@@ -474,6 +502,11 @@ def main():
                 getter = get_nsv_gage
             elif gage.gage_id == 'FOXTON':
                 getter = get_foxton_gage
+            elif gage.gage_id == 'WILDCAT':
+                getter = get_wildcat_gage
+            else:
+                print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
+                continue
 
             try:
                 getter(gage, outpath, verbose=verbose)
