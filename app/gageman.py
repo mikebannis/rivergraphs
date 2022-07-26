@@ -179,7 +179,7 @@ def get_gage(_id=None, _type=None):
         for row in rdr:
             if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
-                            row['location'], row['region'])
+                            row['location'], row['region'], units=row['units'])
                 return gage
     raise ValueError(f'Gage {_type} {_id} not found')
 

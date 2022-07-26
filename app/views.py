@@ -7,22 +7,23 @@ sys.path.append(os.path.dirname(__file__))
 import gageman
 from app import app
 
+CURRENT_FAVS_VER = 0.04
 DEFAULT_FAVORITES = {
-    'version':  0.02,
+    'version':  CURRENT_FAVS_VER,
     'gages': [
-        { 'type': 'DWR', 'id': 'PLABAICO'},  # Bailey
         { 'type': 'DWR', 'id': 'BTBLESCO'},  # Big Thompson
         { 'type': 'USGS', 'id': '09128000'},  # Black canyon
-        { 'type': 'USGS', 'id': '06719505'},  # Black Rock
-
         { 'type': 'VIRTUAL', 'id': 'WILDCAT'},
         { 'type': 'WYSEO', 'id': '4578'},  # Blue grass
         { 'type': 'USGS', 'id': '09352900'},  # Vallecito
+        { 'type': 'PRR', 'id': 'PRR'},  # Vallecito
+
+        { 'type': 'USGS', 'id': '06719505'},  # Black Rock
+        { 'type': 'DWR', 'id': 'PLABAICO'},  # Bailey
         { 'type': 'USGS', 'id': '09058000'},  # Gore
     ]
 }
 
-CURRENT_FAVS_VER = 0.02
 
 def get_favorite_gages():
     """
