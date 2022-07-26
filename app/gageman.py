@@ -86,6 +86,7 @@ class Gage(object):
         elif self.gage_type == 'DWR':
             return f'https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG'
         else:
+            return None
             return f'Human URL not known for {self.gage_id} {self.gage_type}'
 
     def _get_q(self):

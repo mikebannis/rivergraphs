@@ -289,6 +289,31 @@ def get_nsv_gage(gage, outpath, verbose=False):
         time = nsvq.index[-1].strftime('%H:%M:%S')
         f.write(f'{nsvq[-1]},{date},{time}\n')
 
+def get_foxton_gage(gage, outpath, verbose=False):
+    """
+    Determine foxton gage as waterton - deckers
+    """
+    import pandas as pd
+
+    waterton = gageman.get_gage('PLASPLCO', 'DWR').series
+    deckers = gageman.get_gage('06701900', 'USGS').series
+    foxton = (waterton - deckers).dropna()
+
+    if foxton.size <= 0:
+        raise ValueError('No data points calculated for foxton!')
+
+    # clip to last 7 days
+    mask = foxton.index > dt.today() - timedelta(days=PLOT_DAYS)
+    foxton = foxton[mask]
+
+    make_graph(foxton.values, foxton.index, outpath, gage)
+
+    datafile = os.path.join(outpath, gage.data_file())
+    with open(datafile, 'wt') as f:
+        date = foxton.index[-1].strftime('%Y-%m-%d')
+        time = foxton.index[-1].strftime('%H:%M:%S')
+        f.write(f'{foxton[-1]},{date},{time}\n')
+
 
 def get_prr_gage(gage, outpath, verbose=False):
     """
@@ -349,12 +374,6 @@ def get_prr_gage(gage, outpath, verbose=False):
             raw_tss.append(ts)
 
     make_graph(raw_stages, raw_tss, outpath, gage)
-#2.8,2022-05-25,07:00:00
-#3.2,2022-05-27,07:00:00
-#3.1,2022-05-28,07:00:00
-#3.8,2022-05-30,07:00:00
-#3.4,2022-05-31,07:00:00
-#3.4,2022-05-31,07:00:00
 
 
 def main():
@@ -373,6 +392,11 @@ def main():
             gages = [g for g in gages if g.gage_type == 'PRR']
         elif sys.argv[1].lower() == 'reverse':
             gages = gages[::-1]
+        elif sys.argv[1].lower() == '--verbose':
+            pass
+        else:
+            print(f'Unknown option: {sys.argv[1]}')
+            sys.exit()
     elif len(sys.argv) == 3:
         verbose = True
         if sys.argv[1].lower() == '--id':
@@ -445,11 +469,16 @@ def main():
             if verbose:
                 print ('\tsuccess')
 
-        elif gage.gage_type == 'VIRTUAL' and gage.gage_id =='NSV':
+        elif gage.gage_type == 'VIRTUAL':
+            if gage.gage_id =='NSV':
+                getter = get_nsv_gage
+            elif gage.gage_id == 'FOXTON':
+                getter = get_foxton_gage
+
             try:
-                get_nsv_gage(gage, outpath, verbose=verbose)
+                getter(gage, outpath, verbose=verbose)
             except Exception as e:
-                print('\tError getting nsv gage:', e)
+                print(f'\tError getting {gage.gage_type} {gage.gage_id}:', e)
                 continue
 
             if verbose:
