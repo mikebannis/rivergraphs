@@ -22,6 +22,11 @@ register_matplotlib_converters()
 SLEEP = 5  # seconds between pulling gages
 PLOT_DAYS = 7  # Days to plot on graph
 
+USGS_CODE = {
+    'feet': '00065',
+    'cfs': '00060',
+}
+
 
 class URLError(Exception):
     pass
@@ -206,13 +211,39 @@ def get_usgs_gage(gage, outpath, verbose=False):
                 _next = parent.next_sibling
                 q = pull_val(_next)
                 if verbose:
-                    print(f'\tgot: {", ".join(q)}')
+                    print(f'\tgot: {", ".join(q)} from website')
 
                 q_outfile = os.path.join(outpath, gage.data_file())
                 with open(q_outfile, 'wt') as out:
                     for val in q:
                         out.write(str(val) + ',')
                     out.write('\n')
+
+    # Pull multiple values and write to file. URL builder at:
+    # https://waterservices.usgs.gov/rest/IV-Test-Tool.html
+    code = USGS_CODE[gage.units]
+    url = (f'https://waterservices.usgs.gov/nwis/iv/?sites={gage.gage_id}&'
+           f'parameterCd={code}&period=P{PLOT_DAYS}D&siteStatus=all&format=json')
+
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        raise ValueError(f'Bad respone ({resp.status_code}) from {url}, got: '
+                         f'"{resp.text}"')
+
+    results = resp.json()['value']['timeSeries'][0]['values'][0]['value']
+    if verbose:
+        print(f'\tGot {len(results)} results from API. Latest value is: {results[-1]}')
+
+    outfile = os.path.join(outpath, gage.data_file())
+    with open(outfile, 'wt') as out:
+        for result in results:
+            value = result['value']
+            timestamp = result['dateTime']
+            date = timestamp.split('T')[0]
+            time = timestamp.split('T')[1].split('-')[0].split('.')[0]
+
+            data = f'{value},{date},{time}'
+            out.write(data+'\n')
 
 
 def pull_val(text):
