@@ -20,7 +20,6 @@ import util
 register_matplotlib_converters()
 
 LONG_SLEEP = 3  # seconds between pulling gages when called by cron
-SHORT_SLEEP = 0.1  # seconds between pulling gages when called by user
 PLOT_DAYS = 7  # Days to plot on graph
 
 # Extra room at top of custom hydrographs. 1.05 -> 5% extra room above max
@@ -158,7 +157,8 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
         raise ValueError(f'No data to plot for {gage}')
 
     ax.plot(tss, qs)
-    ax.set_ylim(ymin=0, ymax=max(qs)*GRAPH_TOP_BUFFER)
+    max_q = max([q for q in qs if q is not None])
+    ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
     plt.savefig(i_outfile)
@@ -443,12 +443,15 @@ def main():
         sys.exit()
 
     outpath = util.static_dir()
-    sleep = SHORT_SLEEP if verbose else LONG_SLEEP
 
     for i, gage in enumerate(gages):
+        if i > 0 and not verbose:
+            time.sleep(LONG_SLEEP)
+
         if verbose:
             print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
 
+        # USGS is a little special, try twice for image
         if gage.gage_type == 'USGS':
             try:
                 get_usgs_gage(gage, outpath, verbose=verbose)
@@ -456,7 +459,7 @@ def main():
                 try:
                     if verbose:
                         print ('\tno image address, trying again...')
-                    time.sleep(sleep)
+                    time.sleep(LONG_SLEEP)
                     get_usgs_gage(gage, outpath, verbose=verbose)
                 except FailedImageAddr:
                     if verbose:
@@ -468,62 +471,37 @@ def main():
 
             if verbose:
                 print ('\tsuccess')
+            continue
 
-        elif gage.gage_type == 'DWR':
-            try:
-                get_dwr_graph(gage, outpath, verbose=verbose)
-            except Exception as e:
-                print(f'\tError getting gage {gage}: {e}')
-                continue
-
-            if verbose:
-                print ('\tsuccess')
-
+        # Determine gage getter function
+        if gage.gage_type == 'DWR':
+            getter = get_dwr_graph
         elif gage.gage_type == 'PRR':
-            try:
-                get_prr_gage(gage, outpath, verbose=verbose)
-            except Exception as e:
-                print(f'\tError getting gage {gage}: {e}')
-                continue
-
-            if verbose:
-                print ('\tsuccess')
-
+            getter = get_prr_gage
         elif gage.gage_type == 'WYSEO':
-            try:
-                get_wyseo_gage(gage, outpath, verbose=verbose)
-            except Exception as e:
-                print(f'\tError getting gage {gage}: {e}')
-                continue
-
-            if verbose:
-                print ('\tsuccess')
-
-        elif gage.gage_type == 'VIRTUAL':
-            if gage.gage_id =='NSV':
-                getter = get_nsv_gage
-            elif gage.gage_id == 'FOXTON':
-                getter = get_foxton_gage
-            elif gage.gage_id == 'WILDCAT':
-                getter = get_wildcat_gage
-            else:
-                print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
-                continue
-
-            try:
-                getter(gage, outpath, verbose=verbose)
-            except Exception as e:
-                print(f'\tError getting {gage.gage_type} {gage.gage_id}:', e)
-                continue
-
-            if verbose:
-                print ('\tsuccess')
-
+            getter = get_wyseo_gage
+        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'NSV':
+            getter = get_nsv_gage
+        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'FOXTON':
+            getter = get_foxton_gage
+        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'WILDCAT':
+            getter = get_wildcat_gage
         else:
             print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
+            continue
 
-        if i + 1 < len(gages):
-            time.sleep(sleep)
+        # If verbose, we're running interactively. Allow exceptions to propagate
+        if verbose:
+            getter(gage, outpath, verbose=verbose)
+            print ('\tsuccess')
+            continue
+
+        # Running from cron. Catch exceptions and move on
+        try:
+            getter(gage, outpath, verbose=verbose)
+        except Exception as e:
+            print(f'\tError getting {gage.gage_type} {gage.gage_id}:', e)
+            continue
 
 
 if __name__ == '__main__':
