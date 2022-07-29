@@ -29,6 +29,9 @@ BRKDAMCO,DWR,Saint Vrain,Button Rock Res,FR,ac-ft
 
 # ---- Big Thompson
 BTBLESCO,DWR,Big Thompson,Below Lake Estes,FR,cfs
+BTNFDRCO,DWR,Big Thompson,N. Fork - Near Drake,FR,cfs
+BTABCMCO,DWR,Big Thompson,Near Canyon Mouth at Cedar Cove,FR,cfs
+
 # ---- Big South
 LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR,cfs
 
