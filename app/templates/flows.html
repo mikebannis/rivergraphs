@@ -11,7 +11,7 @@
                 <div class="row">
                   <h4> 
                     {% if gage.url() is not none %}
-                      <a id="{{ gage.gage_id }}" href="{{ gage.url() }}">
+                      <a id="{{ gage.gage_id }}" class="gage-name" href="{{ gage.url() }}">
                         {{ gage.location }}
                       </a> &emsp; 
                     {% else %}

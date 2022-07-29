@@ -5,4 +5,6 @@
 .*.swp
 logs
 logs/*
-app/static
+app/static/*.cfs
+app/static/*.gif
+app/static/*.png
