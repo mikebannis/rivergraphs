@@ -138,12 +138,16 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     @param {str} outpath - the static dir
     @param {gageman.Gage} gage - the gage the graph is for
     """
-    # only show last 7 days
+    # only show last 7 days and drop other dirty data
     qs = []
     tss = []
     delta = timedelta(days=PLOT_DAYS)
     for q, ts in zip(raw_qs, raw_tss):
         if raw_tss[-1] - ts > delta:
+            continue
+        if type(q) != float:
+            continue
+        if q is None:
             continue
         qs.append(q)
         tss.append(ts)
@@ -157,7 +161,7 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
         raise ValueError(f'No data to plot for {gage}')
 
     ax.plot(tss, qs)
-    max_q = max([q for q in qs if q is not None])
+    max_q = max(qs)
     ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
