@@ -32,3 +32,11 @@ def gages_file():
         return os.path.join(APP_PATH, GAGE_FILE)
 
 
+def is_float(s):
+    """ Return True if value can be converted to a float """
+    try:
+        _ = float(s)
+        return True
+    except ValueError:
+        return False
+

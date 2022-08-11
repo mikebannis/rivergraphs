@@ -110,7 +110,7 @@ class Gage(object):
                 return 666, 666, 666
 
         try:
-            if self._is_float(fields[0]):
+            if util.is_float(fields[0]):
                 q = self.round_val(float(fields[0]))
             else:
                 q = 'Error'
@@ -132,14 +132,6 @@ class Gage(object):
         if self.units == 'cfs' or self.units == 'ac-ft':
             return int(val)
         return val
-
-    @staticmethod
-    def _is_float(s):
-        try:
-            _ = float(s)
-            return True
-        except ValueError:
-            return False
 
     def __str__(self):
         return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' +\

@@ -138,21 +138,19 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     @param {str} outpath - the static dir
     @param {gageman.Gage} gage - the gage the graph is for
     """
-    # only show last 7 days and drop other dirty data
+    # only show last PLOT_DAYS days and drop other dirty data
     qs = []
     tss = []
     delta = timedelta(days=PLOT_DAYS)
     for q, ts in zip(raw_qs, raw_tss):
         if raw_tss[-1] - ts > delta:
             continue
-        if type(q) != float:
+        if not util.is_float(q):
             continue
         if q is None:
             continue
         qs.append(q)
         tss.append(ts)
-
-    i_outfile = os.path.join(outpath, gage.image_file())
 
     fmt = mdates.DateFormatter('%b\n%d')  # May\n5
     fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
@@ -165,6 +163,8 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
+
+    i_outfile = os.path.join(outpath, gage.image_file())
     plt.savefig(i_outfile)
     plt.close()
 
