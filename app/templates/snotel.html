@@ -1,39 +1,53 @@
 {% extends "base.html" %}
 {% block content %}
-    <a href=https://www.nrcs.usda.gov/wps/portal/nrcs/detail/co/snow/products/?cid=nrcs144p2_063323>NRCS Snotel for Colorado </a>
-    <p>
-      <img src=https://www.wcc.nrcs.usda.gov/ftpref/gis/images/co_swepctnormal_update.png>
-    </p>
-    <p>
-      <a href=https://www.nrcs.usda.gov/wps/portal/wcc/home/quicklinks/imap#version=158&elements=W,R&networks=!&states=ID,NV,WA,WY&counties=!&hucs=1404,1601,1704,1705,1706,1701&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=false&stationLabels=&overlays=&hucOverlays=&basinOpacity=100&basinNoDataOpacity=100&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,basin,elements,location,networks,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=station&basinType=6&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=1&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&seqColor=1&divColor=3&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1981&referenceEnd=2010&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=44.9658&lon=-114.5929&zoom=9.0> Idaho interactive map </a>
-    </p>
-    <p>
-      <img src=https://www.wcc.nrcs.usda.gov/ftpref/gis/images/id_swepctnormal_update.png>
-    </p>
-    <p>
-      <img src=https://www.wcc.nrcs.usda.gov/ftpref/gis/images/wa_swepctnormal_update.png>
-    </p>
-    <p>
-      <img src=https://www.wcc.nrcs.usda.gov/ftpref/gis/images/or_swepctnormal_update.png>
-    </p>
+  <p>
+    <a href="https://www.nrcs.usda.gov/wps/portal/wcc/home/quicklinks/imap#version=167&elements=R&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=all&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=false&stationLabels=&overlays=&hucOverlays=&basinOpacity=45&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=basinstation&basinType=6&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=1&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=3&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1981&referenceEnd=2010&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=43.564&lon=-109.709&zoom=5.0" target="_blank"> 
+      NRCS Snotel for Western US
+    </a>
+  </p>
+
+  <!-- Colorado -->
+  <p>
+    <a href="https://www.nrcs.usda.gov/wps/portal/nrcs/detail/co/snow/products/?cid=nrcs144p2_063323" target="_blank">
+      <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/co_swepctnormal_update.png">
+    </a>
+  </p>
+
+  <!-- Idaho -->
+  <p>
+    <a href="https://www.nrcs.usda.gov/wps/portal/wcc/home/quicklinks/imap#version=167&elements=W,R&networks=!&states=ID&basins=!&hucs=1404,1601,1704,1705,1706,1701&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=false&stationLabels=&overlays=&hucOverlays=6&basinOpacity=50&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,options,elements,location,networks,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=basinstation&basinType=id_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=1&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=3&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1981&referenceEnd=2010&minimumYears=20&hucAssociations=false&relativeDate=-1&lat=45.159&lon=-113.741&zoom=6.0" target="_blank"> 
+      <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/id_swepctnormal_update.png">
+    </a>
+  </p>
+
+  <!-- Washington -->
+  <p>
+    <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/wa_swepctnormal_update.png">
+  </p>
+
+  <!-- Oregon -->
+  <p>
+    <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/or_swepctnormal_update.png">
+  </p>
+
     {#
     <p>
-      <img src=https://www.wcc.nrcs.usda.gov/ftpref/gis/images/west_mtdprecpctnormal_update.png >
+      <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/west_mtdprecpctnormal_update.png">
     </p>
 
       <h2> Colorado State Wide </h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotstate22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotstate22.gif">
       <h2> Arkansas River</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotark22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotark22.gif">
       <h2> South Platte River</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotsprb22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotsprb22.gif">
       <h2> Colorado River</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotcrb22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotcrb22.gif">
       <h2> Gunnison River</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotgrb22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotgrb22.gif">
       <h2> Yampa River</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotywrb22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotywrb22.gif">
       <h2> San Juan, Animas, Dolores, and San Miguel</h2>
-      <img src=https://api.snowdata.info/co/charts/basinplotsmdasjrb22.gif>
+      <img src="https://api.snowdata.info/co/charts/basinplotsmdasjrb22.gif">
       #}
 {% endblock %}
