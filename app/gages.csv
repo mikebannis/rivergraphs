@@ -77,9 +77,10 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
 09163500,USGS,Colorado River,State Line - Westwater,Multi,cfs,https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=CCUC2&linear_flow=0
 09234500,USGS,Green River,Greendale UT - Gates of Lodore,Multi,cfs
 09315000,USGS,Green River,Green River UT - Deso-Grey,Multi,cfs,https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=GRVU1&linear_flow=0
+09168730,USGS,Dolores River,Near Slick Rock CO,Multi,cfs
+09379500,USGS,San Juan River,Near Bluff UT,Multi,cfs,https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=BFFU1&linear_flow=0
 09330500,USGS,Muddy Creek,Near Emery,Multi,cfs
 09497500,USGS,Salt River,Near Chrysotile AZ,Multi,cfs,https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=SLCA3&linear_flow=0
-09168730,USGS,Dolores River,Near Slick Rock CO,Multi,cfs
 06620000,USGS,North Platte River,Near Northgate CO,Multi,cfs
 09380000,USGS,Colorado River,Lee's Ferry,Multi,cfs
 09405500,USGS,North Fork Virgin,Zion,Multi,cfs
