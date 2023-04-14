@@ -14,7 +14,8 @@ class Gage(object):
     Information pertaining to a DWR or USGS gage, and methods returning graph
     image and URL to the actual gage
     """
-    def __init__(self, gage_id, gage_type, river, location, region, units=None):
+    def __init__(self, gage_id, gage_type, river, location, region,
+                 forecast_url, units=None,):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
                                 # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
@@ -24,6 +25,8 @@ class Gage(object):
         if units is None:
             units = 'cfs'
         self.units = units # cfs, feet, or ac-ft
+
+        self.forecast_url = forecast_url
 
         self.q, self.q_date, self.q_time = self._get_q()
 
@@ -149,7 +152,8 @@ def get_gages():
         rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
         for row in rdr:
             temp_gage = Gage(row['gage_id'], row['type'], row['river'],
-                             row['location'], row['region'], units=row['units'])
+                             row['location'], row['region'],
+                             row['forecast_url'], units=row['units'])
             gages.append(temp_gage)
     return gages
 
@@ -171,7 +175,8 @@ def get_gage(_id=None, _type=None):
         for row in rdr:
             if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
-                            row['location'], row['region'], units=row['units'])
+                            row['location'], row['region'],
+                            row['forecast_url'], units=row['units'])
                 return gage
     raise ValueError(f'Gage {_type} {_id} not found')
 

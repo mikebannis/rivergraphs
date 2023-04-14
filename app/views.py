@@ -73,49 +73,40 @@ def flows():
 
 @app.route('/arkansas')
 def arkansas():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'Ark']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('Ark')
 
 @app.route('/front_range')
 def front_range():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'FR']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('FR')
 
 @app.route('/durango')
 def durango():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'Durango']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('Durango')
 
 @app.route('/multiday')
 def multiday():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'Multi']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('Multi')
 
 @app.route('/central')
 def central():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'Central']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('Central')
 
 @app.route('/west_virginia')
 def wv():
-    gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'WV']
-    rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return template_for_region('WV')
 
 @app.route('/wyoming')
 def wyoming():
+    return template_for_region('WY')
+
+def template_for_region(region):
+    """
+    Returned rendered flows template for all rivers in a region
+
+    @param {String} region - region of interest
+    @returns {rendered template}
+    """
     gages = gageman.get_gages()
-    gages = [g for g in gages if g.region == 'WY']
+    gages = [g for g in gages if g.region == region]
     rivers = gageman.get_rivers(gages)
     return render_template('flows.html', rivers=rivers)
