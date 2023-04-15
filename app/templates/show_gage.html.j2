@@ -1,0 +1,37 @@
+{# Show image and data for a gage #}
+<div class="row">
+    <div class="col">
+        <h4 class="fs-5"> 
+            {% if gage.url() is not none %}
+                <a id="{{ gage.gage_id }}" href="{{ gage.url() }}" class="gage-name">
+                {{ gage.location }}
+                </a> &emsp; 
+            {% else %}
+                {{ gage.location }}
+            {% endif %}
+        </h4> 
+    </div>
+    {% if gage.forecast_url is not none %}
+        <div class="col-1 text-end">
+            <a href="{{ gage.forecast_url }}">
+            <img src={{ url_for('static', filename='crystal_ball.svg') }}
+                alt="crystal ball icon"
+                height="22">
+            </a>
+        </div>
+    {% endif %}
+</div>
+<div class="row">
+    <div class="col">
+        <b class="fs-6">{{ gage.q }} {{ gage.units }} </b>
+    </div>
+    <div class="col text-end">
+        <small>@ {{gage.q_time}} {{gage.q_date}}</small>
+    </div>
+</div>
+
+{% if gage.image_exists(): %}
+    <div class="row">
+        <img src={{ url_for('static', filename=gage.image_file()) }}>
+    </div>
+{% endif %}

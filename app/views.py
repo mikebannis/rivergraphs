@@ -56,7 +56,7 @@ def get_favorite_gages():
 
 @app.route('/snotel')
 def snotel():
-    return render_template('snotel.html')
+    return render_template('snotel.html.j2')
 
 @app.route('/flows')
 @app.route('/')
@@ -65,7 +65,7 @@ def flows():
     gages, bad_cookie = get_favorite_gages()
     rivers = gageman.get_rivers(gages)
 
-    resp = make_response(render_template('favorite_flows.html', rivers=rivers))
+    resp = make_response(render_template('favorite_flows.html.j2', rivers=rivers))
 
     if bad_cookie:
         resp.set_cookie('favorites', json.dumps(DEFAULT_FAVORITES))
@@ -109,4 +109,4 @@ def template_for_region(region):
     gages = gageman.get_gages()
     gages = [g for g in gages if g.region == region]
     rivers = gageman.get_rivers(gages)
-    return render_template('flows.html', rivers=rivers)
+    return render_template('flows.html.j2', rivers=rivers)

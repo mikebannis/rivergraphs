@@ -1,0 +1,18 @@
+{#
+  River flows and gages
+#}
+{% extends "base.html.j2" %}
+{% block content %}
+    {% for river, gages in rivers.items() %}
+      <h2 class="fs-4"> {{ river }} </h2>
+        <div class="row mb-0">
+            {% for gage in gages %}
+              <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                <div class="row">
+                  {%include "show_gage.html.j2"%}
+                </div>
+              </div>
+          {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
