@@ -73,7 +73,7 @@ class Gage(object):
             # API Doc: https://github.com/OpenCDSS/cdss-rest-services-examples
             param = 'STORAGE' if self.gage_id == 'BRKDAMCO' else 'DISCHRG'
             return 'https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/' +\
-                    'telemetrytimeseriesraw/?format=jsonprettyprint&abbrev=' +\
+                    'telemetrytimeseriesraw/?format=json&abbrev=' +\
                     f'{self.gage_id}&parameter={param}'
         else:
             return f'Data URL not known for {self.gage_id} {self.gage_type}'

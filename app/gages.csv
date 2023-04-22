@@ -52,6 +52,8 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
 #CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
 
 ######## Central Mountains ##############################
+# --- Escalante
+09151500,USGS,Escalante Creek,Near Delta,Central,cfs
 # --- Colorado River
 09058000,USGS,Colorado River,Kremmling - Gore,Central,cfs
 09070500,USGS,Colorado River,Dotsero - Glenwood Canyon,Central,cfs
@@ -96,7 +98,11 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
 # WY
 4578,WYSEO,Wheatland Tunnel,Blue Grass Creek,WY
 
+#WY
+08263500,USGS,Rio Grande,Upper Taos,NM
+
 # Virtual gages, these should be at the end
 NSV,VIRTUAL,Saint Vrain,NSV - Above Button Rock,FR
 FOXTON,VIRTUAL,North Fork South Platte,Foxton,FR
 WILDCAT,VIRTUAL,South Fork South Platte,Wildcat Canyon,FR
+
