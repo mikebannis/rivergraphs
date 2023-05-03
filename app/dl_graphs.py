@@ -390,6 +390,8 @@ def get_prr_gage(gage, outpath, verbose=False):
 
         # If it's the same data point, don't do anything else
         if old_data.strip() == data.strip():
+            if verbose:
+                print(f'\tData received is same as in data file: {old_data.strip()}')
             return
 
     if verbose:
@@ -402,7 +404,11 @@ def get_prr_gage(gage, outpath, verbose=False):
     with open(datafile, 'rt') as f:
         for line in f:
             fields = line.strip().split(',')
-            raw_stages.append(float(fields[0]))
+            try:
+                raw_stages.append(float(fields[0]))
+            except ValueError:
+                print(f'\tCorrupt line found in {datafile}: "{line.strip()}"')
+                continue
             ts = dt.strptime(f'{fields[1]} {fields[2]}', '%Y-%m-%d %H:%M:%S')
             raw_tss.append(ts)
 
