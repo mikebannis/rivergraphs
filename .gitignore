@@ -8,3 +8,4 @@ logs/*
 app/static/*.cfs
 app/static/*.gif
 app/static/*.png
+.vscode

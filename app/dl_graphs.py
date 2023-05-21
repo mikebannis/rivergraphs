@@ -156,10 +156,10 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
 
     if len(qs) == 0 or len(tss) == 0:
-        raise ValueError(f'No data to plot for {gage}')
+        print(f'No data to plot for {gage}')
 
     ax.plot(tss, qs)
-    max_q = max(qs)
+    max_q = max(qs) if len(qs) > 0 else 0
     ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)

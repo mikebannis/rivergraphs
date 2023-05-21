@@ -34,9 +34,10 @@ def gages_file():
 
 def is_float(s):
     """ Return True if value can be converted to a float """
+    if s is None:
+        return False
     try:
         _ = float(s)
         return True
     except ValueError:
         return False
-
