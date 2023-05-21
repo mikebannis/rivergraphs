@@ -1,9 +1,11 @@
 import csv
+import time
 import util
 import os.path
 import pandas as pd
 # import matplotlib
 from collections import defaultdict
+from datetime import datetime as dt
 #from pandas.plotting import register_matplotlib_converters
 
 #register_matplotlib_converters()
@@ -44,6 +46,12 @@ class Gage(object):
         df.dt = pd.to_datetime(df.dt, format='%Y-%m-%d %H:%M:%S')
         df.index = df.dt
         return df.value
+    
+    @property
+    def q_unix_time(self):
+        q_dt = dt.strptime(f'{self.q_date},{self.q_time}', '%Y-%m-%d,%H:%M:%S')
+        return round(time.mktime(q_dt.timetuple()))
+
 
     def image_file(self):
         """ Return file name for gage image"""
@@ -64,7 +72,7 @@ class Gage(object):
         return os.path.exists(os.path.join(path, 'static', self.image_file()))
 
     def data_url(self):
-        """ Return data URL for gage"""
+        """ Return data API URL for gage"""
         if self.gage_type == 'USGS':
             return 'https://waterdata.usgs.gov/nwis/uv?site_no=' + self.gage_id
         elif self.gage_type == 'PRR':
@@ -90,7 +98,7 @@ class Gage(object):
             return f'https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG'
         else:
             return None
-            return f'Human URL not known for {self.gage_id} {self.gage_type}'
+            # return f'Human URL not known for {self.gage_id} {self.gage_type}'
 
     def _get_q(self):
         """
