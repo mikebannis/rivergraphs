@@ -37,7 +37,7 @@ LAPLODCO,DWR,Big South,Below Long Draw Reservoir,FR,cfs
 
 TARTARCO,DWR,Tarryall Creek,Below Tarryall Res.,FR,cfs
 
-######## Central Mountains ##############################
+######## Arkansas River ##############################
 # --- Arkansas
 ARKGRNCO,DWR,Arkansas River,Granite,Ark,cfs
 07087050,USGS,Arkansas River,Numbers Put-in,Ark,cfs
@@ -52,8 +52,14 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
 #CCACCRCO,DWR,Arkansas Headwaters,Clear Creek Above Clear Creek Reservoir,Ark
 
 ######## Central Mountains ##############################
+09050700,USGS,Blue River,Below Dillon,Central,cfs
+09057500,USGS,Blue River,Below Green Mtn Res,Central,cfs
+
+09050100,USGS,Ten Mile Crk,Near Frisco,Central,cfs
+
 # --- Escalante
 09151500,USGS,Escalante Creek,Near Delta,Central,cfs
+
 # --- Colorado River
 09058000,USGS,Colorado River,Kremmling - Gore,Central,cfs
 09070500,USGS,Colorado River,Dotsero - Glenwood Canyon,Central,cfs
