@@ -364,21 +364,29 @@ def get_prr_gage(gage, outpath, verbose=False):
         raise URLError(response.status_code, response.text)
 
     soup = BeautifulSoup(response.text, 'html.parser')
+    headers = soup.find_all(class_='entry-header')
 
-    try:
-        # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
-        header = soup.find(class_='entry-header')
-        stage = header.find('a').getText().split(' ')[2].replace('+', '').replace('-', '')
-        time = header.find('a').getText().split(' ')[4]
-        # Get date, e.g. 'May 31, 2022 By Camp Falbo '
-        meta = header.find('p').getText().split(',')
-    except Exception as e:
+    # Hazard or accident headers won't match the rock report format, try all headers
+    meta, time = None, None 
+    for header in headers:
+        try:
+            # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
+            stage = header.find('a').getText().split(' ')[2].replace('+', '').replace('-', '')
+            time = header.find('a').getText().split(' ')[4]
+
+            # Get date, e.g. 'May 31, 2022 By Camp Falbo '
+            meta = header.find('p').getText().split(',')
+            mmm_dd = meta[0]
+            year = meta[1].strip().split(' ')[0]
+            ts = dt.strptime(f'{mmm_dd} {year} {time}', '%B %d %Y %H%M')
+            break
+        except (IndexError, ValueError):
+            pass
+
+    if meta is None or time is None:
         print(f'Error pulling PRR: {e}')
         return
 
-    mmm_dd = meta[0]
-    year = meta[1].strip().split(' ')[0]
-    ts = dt.strptime(f'{mmm_dd} {year} {time}', '%B %d %Y %H%M')
     data = '{},{},{}'.format(stage, ts.date(), ts.time())
 
     # grab last line of data file if it exists
