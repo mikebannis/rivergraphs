@@ -17,6 +17,8 @@ PLAGEOCO,DWR,South Fork South Platte,Eleven Mile Canyon,FR,cfs
 06701900,USGS,South Fork South Platte,Chutes (Deckers),FR
 # ---- South Platte
 PLASPLCO,DWR,South Platte,Waterton Canyon,FR,cfs
+06710247,USGS,South Platte,Below Union Ave,FR,cfs
+
 # ---- Boulder Creek 
 BOCOROCO,DWR,Boulder Creek,North Boulder - Near Orodell,FR,cfs
 BOCPINCO,DWR,Boulder Creek,South Boulder - Above Gross Res - Alto Alto,FR,cfs
@@ -80,7 +82,7 @@ CCBCCRCO,DWR,Arkansas Headwaters,Clear Creek Below Clear Creek Reservoir,Ark,cfs
 09361500,USGS,Animas River,Durango,Durango,cfs
 09349800,USGS,Piedra,Near Arboles CO,Durango,cfs
 
-# -- multiday stuff
+############## multiday stuff ########################### 
 13309220,USGS,Middle Fork Salmon,MF Lodge,Multi,feet,https://water.weather.gov/ahps2/hydrograph.php?wfo=boi&gage=midi1
 09163500,USGS,Colorado River,State Line - Westwater,Multi,cfs,https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=CCUC2&linear_flow=0
 09234500,USGS,Green River,Greendale UT - Gates of Lodore,Multi,cfs
