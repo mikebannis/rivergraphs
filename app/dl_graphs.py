@@ -103,6 +103,11 @@ def get_dwr_graph(gage, outpath, verbose=False):
     prarm: outpath - path to output dir
     """
     response = requests.get(gage.data_url())
+    if response.status_code == 404: 
+        if response.text == 'This URL is properly formatted, but returns zero records from CDSS.':
+            pass
+        else:
+            raise URLError(response.status_code, response.text)
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
     results = response.json()['ResultList']

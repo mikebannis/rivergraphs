@@ -1,6 +1,6 @@
-import csv
 import time
 import util
+import yaml
 import os.path
 import pandas as pd
 # import matplotlib
@@ -157,8 +157,8 @@ def get_gages():
     """
     gages = []
     with open(util.gages_file(), 'rt') as infile:
-        rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
-        for row in rdr:
+        raw_gages = yaml.safe_load(infile)
+        for row in raw_gages:
             temp_gage = Gage(row['gage_id'], row['type'], row['river'],
                              row['location'], row['region'],
                              row['forecast_url'], units=row['units'])
@@ -179,8 +179,8 @@ def get_gage(_id=None, _type=None):
 
     gages = []
     with open(util.gages_file(), 'rt') as infile:
-        rdr = csv.DictReader(filter(lambda row: row[0] != '#', infile))
-        for row in rdr:
+        raw_gages = yaml.safe_load(infile)
+        for row in raw_gages:
             if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
                             row['location'], row['region'],

@@ -1,7 +1,7 @@
 import os
 
 APP_PATH='/var/www/rivergraphs/app/'
-GAGE_FILE= 'gages.csv'
+GAGE_FILE= 'gages.yaml'
 STATIC_DIR='static'
 
 def static_dir():
