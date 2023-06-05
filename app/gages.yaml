@@ -5,154 +5,132 @@
   location: Dumont
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: 06719505
   type: USGS
   river: Clear Creek
   location: Golden
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: CHUDITCO
   type: DWR
   river: Clear Creek
   location: Church Ditch
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: PRR
   type: PRR
   river: Cache la Poudre
   location: At The Rock
   region: FR
   units: feet
-  forecast_url: null
 - gage_id: ROBTUNCO
   type: DWR
   river: North Fork South Platte
   location: Roberts Tunnel
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: PLABAICO
   type: DWR
   river: North Fork South Platte
   location: Bailey
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: PLAGEOCO
   type: DWR
   river: South Fork South Platte
   location: Eleven Mile Canyon
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: '06700000'
   type: USGS
   river: South Fork South Platte
   location: Above Cheesman Lake
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: 06701900
   type: USGS
   river: South Fork South Platte
   location: Chutes (Deckers)
   region: FR
-  units: null
-  forecast_url: null
+  units: cfs
 - gage_id: PLASPLCO
   type: DWR
   river: South Platte
   location: Waterton Canyon
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: '06710247'
   type: USGS
   river: South Platte
   location: Below Union Ave
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BOCOROCO
   type: DWR
   river: Boulder Creek
   location: North Boulder - Near Orodell
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BOCPINCO
   type: DWR
   river: Boulder Creek
   location: South Boulder - Above Gross Res - Alto Alto
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BOCBGRCO
   type: DWR
   river: Boulder Creek
   location: South Boulder - Below Gross Res - LSB
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BOCELSCO
   type: DWR
   river: Boulder Creek
   location: South Boulder - near Eldorado
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: NSVBBRCO
   type: DWR
   river: Saint Vrain
   location: NSV - Proving Grounds
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BRKDAMCO
   type: DWR
   river: Saint Vrain
   location: Button Rock Res
   region: FR
   units: ac-ft
-  forecast_url: null
 - gage_id: BTBLESCO
   type: DWR
   river: Big Thompson
   location: Below Lake Estes
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BTNFDRCO
   type: DWR
   river: Big Thompson
   location: N. Fork - Near Drake
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: BTABCMCO
   type: DWR
   river: Big Thompson
   location: Near Canyon Mouth at Cedar Cove
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: LAPLODCO
   type: DWR
   river: Big South
   location: Below Long Draw Reservoir
   region: FR
   units: cfs
-  forecast_url: null
 - gage_id: TARTARCO
   type: DWR
   river: Tarryall Creek
   location: Below Tarryall Res.
   region: FR
   units: cfs
-  forecast_url: null
 
 ######## Arkansas River ##############################
 - gage_id: ARKGRNCO
@@ -161,63 +139,54 @@
   location: Granite
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: 07087050
   type: USGS
   river: Arkansas River
   location: Numbers Put-in
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: 07091200
   type: USGS
   river: Arkansas River
   location: Browns/Nathrup
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: 07094500
   type: USGS
   river: Arkansas River
   location: Parkdale
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: LAKATLCO
   type: DWR
   river: Lake Creek
   location: Lake Creek Above Twin Lakes Reservoir
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: TWITUNCO
   type: DWR
   river: Lake Creek
   location: Twin Lakes Tunnel
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: LAKBTLCO
   type: DWR
   river: Lake Creek
   location: Lake Creek Below Twin Lakes Reservoir
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: 07083710
   type: USGS
   river: Arkansas Headwaters
   location: Arkansas Near Malta
   region: Ark
   units: cfs
-  forecast_url: null
 - gage_id: CCBCCRCO
   type: DWR
   river: Arkansas Headwaters
   location: Clear Creek Below Clear Creek Reservoir
   region: Ark
   units: cfs
-  forecast_url: null
     
 ######## Central Mountains ##############################
 - gage_id: 09050700
@@ -226,119 +195,110 @@
   location: Below Dillon
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09057500
   type: USGS
   river: Blue River
   location: Below Green Mtn Res
   region: Central
   units: cfs
-  forecast_url: null
+
 - gage_id: 09050100
   type: USGS
   river: Ten Mile Crk
   location: Near Frisco
   region: Central
   units: cfs
-  forecast_url: null
+- gage_id: 09047500
+  type: USGS
+  river: Snake River
+  location: Near Montezuma
+  region: Central
+  units: cfs
+
 - gage_id: 09151500
   type: USGS
   river: Escalante Creek
   location: Near Delta
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09058000
   type: USGS
   river: Colorado River
   location: Kremmling - Gore
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09070500
   type: USGS
   river: Colorado River
   location: Dotsero - Glenwood Canyon
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09081600
   type: USGS
   river: Crystal River
   location: Near Redstone
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09064600
   type: USGS
   river: Eagle River
   location: Minturn
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09076300
   type: USGS
   river: Roaring Fork
   location: Slaughterhouse
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09112200
   type: USGS
   river: Upper East
   location: Below Cement Creek
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: '385106106571000'
   type: USGS
   river: Slate River
   location: Near Crested Butte
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09128000
   type: USGS
   river: Gunnison River
   location: Black Canyon
   region: Central
   units: cfs
-  forecast_url: null
 - gage_id: 09352900
   type: USGS
   river: Vallecito Creek
   location: Near Bayfield
   region: Durango
   units: feet
-  forecast_url: null
 - gage_id: 09359020
   type: USGS
   river: Animas River
   location: Below Silverton
   region: Durango
   units: cfs
-  forecast_url: null
 - gage_id: 09359500
   type: USGS
   river: Animas River
   location: Tacoma
   region: Durango
   units: cfs
-  forecast_url: null
 - gage_id: 09361500
   type: USGS
   river: Animas River
   location: Durango
   region: Durango
   units: cfs
-  forecast_url: null
 - gage_id: 09349800
   type: USGS
   river: Piedra
   location: Near Arboles CO
   region: Durango
   units: cfs
-  forecast_url: null
 
 ############## multiday stuff ########################### 
 - gage_id: '13309220'
@@ -361,7 +321,6 @@
   location: Greendale UT - Gates of Lodore
   region: Multi
   units: cfs
-  forecast_url: null
 - gage_id: 09315000
   type: USGS
   river: Green River
@@ -375,7 +334,6 @@
   location: Near Slick Rock CO
   region: Multi
   units: cfs
-  forecast_url: null
 - gage_id: 09379500
   type: USGS
   river: San Juan River
@@ -389,7 +347,6 @@
   location: Near Emery
   region: Multi
   units: cfs
-  forecast_url: null
 - gage_id: 09497500
   type: USGS
   river: Salt River
@@ -403,21 +360,18 @@
   location: Near Northgate CO
   region: Multi
   units: cfs
-  forecast_url: null
 - gage_id: 09380000
   type: USGS
   river: Colorado River
   location: Lee's Ferry
   region: Multi
   units: cfs
-  forecast_url: null
 - gage_id: 09405500
   type: USGS
   river: North Fork Virgin
   location: Zion
   region: Multi
   units: cfs
-  forecast_url: null
 
 ############## West Virginy ########################### 
 - gage_id: 03192000
@@ -426,49 +380,42 @@
   location: Above Belva
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: 03185400
   type: USGS
   river: New River
   location: Thurmond
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: 03193000
   type: USGS
   river: Kanawha River
   location: Kanawha Falls
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: 03190000
   type: USGS
   river: Meadow River
   location: Nallen
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: '03076500'
   type: USGS
   river: Upper Youghiogheny
-  location: Friendsville. MD
+  location: Friendsville, MD
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: 03187500
   type: USGS
   river: Cranberry River
   location: Near Richwood
   region: WV
   units: cfs
-  forecast_url: null
 - gage_id: '03057000'
   type: USGS
   river: Tygart Valley River
   location: Colfax
   region: WV
   units: cfs
-  forecast_url: null
 
 ############## Wyoming ########################### 
 - gage_id: '4578'
@@ -476,8 +423,7 @@
   river: Wheatland Tunnel
   location: Blue Grass Creek
   region: WY
-  units: null
-  forecast_url: null
+  units: cfs
 
 ############## New Mexico ########################### 
 - gage_id: 08263500
@@ -485,8 +431,7 @@
   river: Rio Grande
   location: Upper Taos
   region: NM
-  units: null
-  forecast_url: null
+  units: cfs
 
 ####### Virtual gages, these should be at the end
 - gage_id: NSV
@@ -494,19 +439,16 @@
   river: Saint Vrain
   location: NSV - Above Button Rock
   region: FR
-  units: null
-  forecast_url: null
+  units: cfs
 - gage_id: FOXTON
   type: VIRTUAL
   river: North Fork South Platte
   location: Foxton
   region: FR
-  units: null
-  forecast_url: null
+  units: cfs
 - gage_id: WILDCAT
   type: VIRTUAL
   river: South Fork South Platte
   location: Wildcat Canyon
   region: FR
-  units: null
-  forecast_url: null
+  units: cfs

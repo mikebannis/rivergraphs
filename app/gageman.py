@@ -161,7 +161,7 @@ def get_gages():
         for row in raw_gages:
             temp_gage = Gage(row['gage_id'], row['type'], row['river'],
                              row['location'], row['region'],
-                             row['forecast_url'], units=row['units'])
+                             row.get('forecast_url', None), units=row['units'])
             gages.append(temp_gage)
     return gages
 
@@ -184,7 +184,7 @@ def get_gage(_id=None, _type=None):
             if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
                             row['location'], row['region'],
-                            row['forecast_url'], units=row['units'])
+                            row.get('forecast_url', None), units=row['units'])
                 return gage
     raise ValueError(f'Gage {_type} {_id} not found')
 
