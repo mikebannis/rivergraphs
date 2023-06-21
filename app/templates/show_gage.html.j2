@@ -4,20 +4,16 @@
         <h4 class="fs-5"> 
             {% if gage.url() is not none %}
                 <a id="{{ gage.gage_id }}" href="{{ gage.url() }}" class="gage-name">
-                {{ gage.location }}
+                {{ gage.location }} 
                 </a> &emsp; 
             {% else %}
-                {{ gage.location }}
+                {{ gage.location }} 
             {% endif %}
         </h4> 
     </div>
-    {% if gage.forecast_url is not none %}
+    {% if gage.menu != {} %}
         <div class="col-1 text-end">
-            <a href="{{ gage.forecast_url }}">
-            <img src={{ url_for('static', filename='crystal_ball.svg') }}
-                alt="crystal ball icon"
-                height="22">
-            </a>
+            {%include "gage_menu.html.j2" %}
         </div>
     {% endif %}
 </div>

@@ -17,7 +17,7 @@ class Gage(object):
     image and URL to the actual gage
     """
     def __init__(self, gage_id, gage_type, river, location, region,
-                 forecast_url, units=None,):
+                 menu={}, units=None,):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
                                 # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
@@ -28,7 +28,7 @@ class Gage(object):
             units = 'cfs'
         self.units = units # cfs, feet, or ac-ft
 
-        self.forecast_url = forecast_url
+        self.menu = menu
 
         self.q, self.q_date, self.q_time = self._get_q()
 
@@ -161,12 +161,12 @@ def get_gages():
         for row in raw_gages:
             temp_gage = Gage(row['gage_id'], row['type'], row['river'],
                              row['location'], row['region'],
-                             row.get('forecast_url', None), units=row['units'])
+                             row.get('menu', {}), units=row['units'])
             gages.append(temp_gage)
     return gages
 
 
-def get_gage(_id=None, _type=None):
+def get_gage(_id=None, _type=None) -> Gage:
     """
     Load individual gage from file
 
@@ -184,7 +184,7 @@ def get_gage(_id=None, _type=None):
             if row['gage_id'] == _id and row['type'] == _type:
                 gage = Gage(row['gage_id'], row['type'], row['river'],
                             row['location'], row['region'],
-                            row.get('forecast_url', None), units=row['units'])
+                            row.get('menu', {}), units=row['units'])
                 return gage
     raise ValueError(f'Gage {_type} {_id} not found')
 
