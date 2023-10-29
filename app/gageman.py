@@ -4,13 +4,16 @@ import yaml
 import os.path
 from collections import defaultdict
 from datetime import datetime as dt
-from typing import Optional
+from typing import Union
 
 import pandas as pd
 
 GAGE_TYPES = ['USGS', 'DWR', 'PRR', 'WYSEO', 'VIRTUAL']
 
-class Gage(object):
+# Age of data in hours before old data warning is displayed
+OLD_DATA_HOURS = 6  
+
+class Gage:
     """
     Information pertaining to a DWR or USGS gage, and methods returning graph
     image and URL to the actual gage
@@ -46,7 +49,7 @@ class Gage(object):
         return df.value
     
     @property
-    def q_unix_time(self) -> str:
+    def q_unix_time(self) -> Union[str, int]:
         try: 
             q_dt = dt.strptime(f'{self.q_date},{self.q_time}', '%Y-%m-%d,%H:%M:%S')
             _dt = round(time.mktime(q_dt.timetuple()))
@@ -56,7 +59,39 @@ class Gage(object):
             return msg
 
         return _dt
+    
+    @property
+    def old_date_warning(self) -> str:
+        """
+        Display a warning if the gage timestamp is old
 
+        @returns HTML of the warning
+        """
+        ts = self.q_unix_time
+        if isinstance(ts, str):
+            # Bad timestamp
+            tooltip = 'Gage timestamp does not appear to be valid'
+            return f"""
+                <i class="fa-solid fa-warning text-danger" data-bs-toggle="tooltip"
+                   title="{tooltip}">
+                </i>
+            """
+
+        current_ts = time.time()
+        diff = current_ts - ts
+
+        if diff < OLD_DATA_HOURS * 3600:
+            return ''
+
+        tooltip = f'Gage data is {round(diff/3600, 1)} hours old'
+        if diff / 3600 > 24: 
+            tooltip = f'Gage data is {int(diff/3600/24)} days old'
+
+        return f"""
+            <i class="fa-solid fa-warning text-danger" data-bs-toggle="tooltip"
+                title="{tooltip}">
+            </i>
+        """
 
     def image_file(self):
         """ Return file name for gage image"""
