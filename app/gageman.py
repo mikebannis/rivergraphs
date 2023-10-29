@@ -2,22 +2,21 @@ import time
 import util
 import yaml
 import os.path
-import pandas as pd
-# import matplotlib
 from collections import defaultdict
 from datetime import datetime as dt
-#from pandas.plotting import register_matplotlib_converters
+from typing import Optional
 
-#register_matplotlib_converters()
+import pandas as pd
 
+GAGE_TYPES = ['USGS', 'DWR', 'PRR', 'WYSEO', 'VIRTUAL']
 
 class Gage(object):
     """
     Information pertaining to a DWR or USGS gage, and methods returning graph
     image and URL to the actual gage
     """
-    def __init__(self, gage_id, gage_type, river, location, region,
-                 forecast_url, units=None,):
+    def __init__(self, gage_id: str, gage_type: str, river: str, location: str, region: str,
+                 forecast_url: str, units: Optional[str] = None):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
                                 # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
@@ -32,9 +31,8 @@ class Gage(object):
 
         self.q, self.q_date, self.q_time = self._get_q()
 
-        gage_types = ['USGS', 'DWR', 'PRR', 'WYSEO', 'VIRTUAL']
-        if gage_type not in gage_types:
-            raise AttributeError(f'gage_type must be {", ".join(gage_types)} '
+        if gage_type not in GAGE_TYPES:
+            raise AttributeError(f'gage_type must be {", ".join(GAGE_TYPES)} '
                                  f'passed {gage_type}')
 
     @property
@@ -48,9 +46,16 @@ class Gage(object):
         return df.value
     
     @property
-    def q_unix_time(self):
-        q_dt = dt.strptime(f'{self.q_date},{self.q_time}', '%Y-%m-%d,%H:%M:%S')
-        return round(time.mktime(q_dt.timetuple()))
+    def q_unix_time(self) -> str:
+        try: 
+            q_dt = dt.strptime(f'{self.q_date},{self.q_time}', '%Y-%m-%d,%H:%M:%S')
+            _dt = round(time.mktime(q_dt.timetuple()))
+        except ValueError as e:
+            msg = f"Error converting q_date: '{self.q_date}', q_time: '{self.q_time}' for {self.gage_id}"
+            print(msg, e)
+            return msg
+
+        return _dt
 
 
     def image_file(self):
@@ -177,7 +182,6 @@ def get_gage(_id=None, _type=None):
     if _id is None or _type is None:
         raise AttributeError('Both _id and _type must be set')
 
-    gages = []
     with open(util.gages_file(), 'rt') as infile:
         raw_gages = yaml.safe_load(infile)
         for row in raw_gages:
