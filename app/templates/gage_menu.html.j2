@@ -1,0 +1,19 @@
+<div class="dropdown">
+  <button class="btn " type="button" 
+        id="{{ gage.gage_id }}dropdownMenuButton" data-bs-toggle="dropdown" 
+        aria-expanded="false">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="{{ gage.gage_id }}dropdownMenuButton">
+    {% if gage.menu.get('forecase_url', none) is none %}
+        <li>
+            <a class="dropdown-item" href="{{ gage.menu['forecast_url'] }}">
+                <img src={{ url_for('static', filename='crystal_ball.svg') }}
+                    alt="crystal ball icon"
+                    height="22"> 
+                <span> Flow Forecast </span>
+            </a>
+        </li>
+    {% endif %}
+  </ul>
+</div>
