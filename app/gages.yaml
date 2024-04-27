@@ -422,7 +422,7 @@
   units: cfs
   menu:
     forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=SLCA3&linear_flow=0
-    swe_plot: https://nwcc-apps.sc.egov.usda.gov/basin-plots/#AZ
+    swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCaz2_8/upper_salt.html
 - gage_id: '06620000'
   type: USGS
   river: North Platte River
