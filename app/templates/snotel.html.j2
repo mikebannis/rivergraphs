@@ -1,33 +1,49 @@
 {% extends "base.html.j2" %}
 {% block content %}
+  <h1> SNOTEL Data </h1>
+  <h2> State Basin Conditions </h2>
   <p>
-    <a href="https://www.nrcs.usda.gov/wps/portal/wcc/home/quicklinks/imap#version=167&elements=R&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=all&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=false&stationLabels=&overlays=&hucOverlays=&basinOpacity=45&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=basinstation&basinType=6&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=1&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=3&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1981&referenceEnd=2010&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=43.564&lon=-109.709&zoom=5.0" target="_blank"> 
-      NRCS Snotel for Western US
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=true&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=state&basinOpacity=75&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=100&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks,baseMaps,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriWsr&displayType=basin&basinType=co_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=B&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=fixed&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=39.659&lon=-102.227&zoom=6.9&autoExport=full,pdf,2,2,L,BL,Colorado%20SNOTEL,41.6618,36.2456,-100.5904,-111.329" target="_blank">
+      Colorado
     </a>
   </p>
 
-  <!-- Colorado -->
   <p>
-    <a href="https://www.nrcs.usda.gov/wps/portal/nrcs/detail/co/snow/products/?cid=nrcs144p2_063323" target="_blank">
-      <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/co_swepctnormal_update.png">
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=true&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=state&basinOpacity=75&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=100&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks,baseMaps,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriWsr&displayType=basin&basinType=id_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=B&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=fixed&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=44.950&lon=-113.731&zoom=5.9&autoExport=full,pdf,2,2,P,BL,Idaho%20SNOTEL,49.6116,40.4005,-109.3744,-120.5605" target="_blank">
+      Idaho
     </a>
   </p>
 
-  <!-- Idaho -->
   <p>
-    <a href="https://www.nrcs.usda.gov/wps/portal/wcc/home/quicklinks/imap#version=167&elements=W,R&networks=!&states=ID&basins=!&hucs=1404,1601,1704,1705,1706,1701&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=false&stationLabels=&overlays=&hucOverlays=6&basinOpacity=50&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,options,elements,location,networks,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=basinstation&basinType=id_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=1&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=3&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1981&referenceEnd=2010&minimumYears=20&hucAssociations=false&relativeDate=-1&lat=45.159&lon=-113.741&zoom=6.0" target="_blank"> 
-      <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/id_swepctnormal_update.png">
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!MSNT&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=true&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=state&basinOpacity=75&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=100&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks,baseMaps,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriWsr&displayType=basin&basinType=wa_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=B&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=fixed&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=48.124&lon=-120.914&zoom=6.9&autoExport=full,pdf,2,2,L,BL,Washington%20SNOTEL,49.4893,44.9175,-114.8615,-125.2705" target="_blank">
+      Washington
     </a>
   </p>
 
-  <!-- Washington -->
   <p>
-    <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/wa_swepctnormal_update.png">
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=true&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=state&basinOpacity=75&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=100&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks,baseMaps,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriWsr&displayType=basin&basinType=or_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=wytd&customDuration=&dayPart=E&monthPart=B&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=fixed&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=44.356&lon=-118.747&zoom=5.9&autoExport=full,pdf,2,2,L,BL,Oregon%20SNOTEL,46.5447,40.669,-114.5083,-127.0132" target="_blank">
+      Oregon
+    </a>
+  </p>
+  <p>
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!MSNT&states=!&basins=!&hucs=16,1801&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=true&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=state&basinOpacity=75&basinNoDataOpacity=0&basemapOpacity=100&maskOpacity=100&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks,baseMaps,overlays,labels&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriWsr&displayType=basin&basinType=ca_8&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=B&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=fixed&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=39.431&lon=-115.767&zoom=6.3&autoExport=full,pdf,2,2,P,BL,California%20SNOTEL,43.6213,37.0027,-117.7485,-125.1908" target="_blank">
+      California
+    </a>
   </p>
 
-  <!-- Oregon -->
+  <hr>
+  <h2> Interactive Maps </h2>
+
   <p>
-    <img src="https://www.wcc.nrcs.usda.gov/ftpref/gis/images/or_swepctnormal_update.png">
+    <a href="https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq" target="_blank">
+      Colorado Interactive Basin Conditions
+    </a>
+  </p>
+
+  <p>
+    <a href="https://nwcc-apps.sc.egov.usda.gov/imap/#version=169&elements=&networks=!&states=!&basins=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=&basinOpacity=75&basinNoDataOpacity=25&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks&controlsOpen=true&popup=&popupMulti=&popupBasin=&base=esriNgwm&displayType=basin&basinType=6&dataElement=WTEQ&depth=-8&parameter=PCTMED&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-1&lat=41.751&lon=-112.896&zoom=5.0" target="_blank">
+      National Interactive Basin Conditions
+    </a>
   </p>
 
     {#
