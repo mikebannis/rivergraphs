@@ -23,7 +23,6 @@ print(f' got {len(r.json()["Data"])} data points')
 print(r)
 #pprint(r.request.body)
 # pprint(r.content)
-# breakpoint()
 
 df = pd.DataFrame(r.json()['Data'])
 print(df.head())
@@ -33,7 +32,6 @@ mid2 = dt.now()
 print(f'made df in {mid2 - mid}')
 
 #df.Value.plot()
-# breakpoint()
 
 plt.plot(df.TimeStamp, df.Value)
 plt.show()

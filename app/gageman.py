@@ -11,7 +11,7 @@ import pandas as pd
 GAGE_TYPES = ['USGS', 'DWR', 'PRR', 'WYSEO', 'VIRTUAL']
 
 # Age of data in hours before old data warning is displayed
-OLD_DATA_HOURS = 6  
+OLD_DATA_HOURS = 6
 
 class Gage:
     """
@@ -47,10 +47,10 @@ class Gage:
         df.dt = pd.to_datetime(df.dt, format='%Y-%m-%d %H:%M:%S')
         df.index = df.dt
         return df.value
-    
+
     @property
     def q_unix_time(self) -> Union[str, int]:
-        try: 
+        try:
             q_dt = dt.strptime(f'{self.q_date},{self.q_time}', '%Y-%m-%d,%H:%M:%S')
             _dt = round(time.mktime(q_dt.timetuple()))
         except ValueError as e:
@@ -59,7 +59,7 @@ class Gage:
             return msg
 
         return _dt
-    
+
     @property
     def old_date_warning(self) -> str:
         """
@@ -84,7 +84,7 @@ class Gage:
             return ''
 
         tooltip = f'Gage data is {round(diff/3600, 1)} hours old'
-        if diff / 3600 > 24: 
+        if diff / 3600 > 24:
             tooltip = f'Gage data is {int(diff/3600/24)} days old'
 
         return f"""
@@ -185,8 +185,17 @@ class Gage:
         return val
 
     def __str__(self):
-        return self.gage_id + ',' + self.gage_type + ',' + self.river + ',' +\
-                self.location + ',' + self.region
+        """
+        This format may be getting used for export to CSV files, not sure.
+        Don't change w/o checking!!!
+        """
+        return f'{self.gage_id},{self.gage_type},{self.river},{self.location},{self.region}'
+
+    def __repr__(self):
+        return (
+            f'gage_id={self.gage_id}, gage_type={self.gage_type}, river={self.river}, '
+            f'location={self.location}, region={self.region}, units={self.units}, menu={self.menu}'
+        )
 
 
 def get_gages():
