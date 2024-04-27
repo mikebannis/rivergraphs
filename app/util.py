@@ -41,3 +41,5 @@ def is_float(s):
         return True
     except ValueError:
         return False
+    except TypeError:
+        return False

@@ -30,6 +30,8 @@ USGS_CODE = {
     'cfs': '00060',
 }
 
+TIMEOUT = 30  # timeout for get requests, in seconds
+
 
 class URLError(Exception):
     pass
@@ -65,7 +67,7 @@ def get_wyseo_gage(gage, outpath, verbose=False):
     }
     response = requests.post(
         'https://seoflow.wyo.gov/Data/DatasetGrid?dataset=4578',
-        data=data
+        data=data, timeout=TIMEOUT,
     )
 
     if response.status_code != 200:
@@ -73,9 +75,13 @@ def get_wyseo_gage(gage, outpath, verbose=False):
     results = response.json()['Data']
 
     outfile = os.path.join(outpath, gage.data_file())
+    data = ''
     with open(outfile, 'wt') as out:
         for result in results:
             q = result['Value']
+            if not util.is_float(q):
+                continue
+
             timestamp = utc.localize(dt.strptime(result['TimeStamp'], date_f))
             timestamp = timestamp.astimezone(mtn)
             timestamp_str = timestamp.strftime('%Y-%m-%d,%H:%M:%S')
@@ -102,25 +108,32 @@ def get_dwr_graph(gage, outpath, verbose=False):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
-    response = requests.get(gage.data_url())
-    if response.status_code == 404: 
+    response = requests.get(gage.data_url(), timeout=TIMEOUT,)
+    if response.status_code == 404:
         if response.text == 'This URL is properly formatted, but returns zero records from CDSS.':
-            pass
+            print('\tNo records returned from CDSS.')
+            return
         else:
             raise URLError(response.status_code, response.text)
-    if response.status_code != 200:
+    elif response.status_code != 200:
         raise URLError(response.status_code, response.text)
     results = response.json()['ResultList']
 
     outfile = os.path.join(outpath, gage.data_file())
+    data = ''
     with open(outfile, 'wt') as out:
         for result in results:
             q = result['measValue']
-            timestamp = result['measDateTime']
-            date = timestamp.split('T')[0]
-            time = timestamp.split('T')[1]
+            if not util.is_float(q):
+                continue
 
-            data = f'{q},{date},{time}'
+            timestamp = result['measDateTime']
+            if not 'T' in timestamp:
+                continue
+            date = timestamp.split('T')[0]
+            time_part = timestamp.split('T')[1]
+
+            data = f'{q},{date},{time_part}'
             out.write(data+'\n')
 
     if verbose:
@@ -158,13 +171,15 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
         tss.append(ts)
 
     fmt = mdates.DateFormatter('%b\n%d')  # May\n5
-    fig, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
+    _, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
 
     if len(qs) == 0 or len(tss) == 0:
         print(f'No data to plot for {gage}')
 
     ax.plot(tss, qs)
-    max_q = max(qs) if len(qs) > 0 else 0
+
+    # Setting ymax to 0 throws a warning, use 1 instead
+    max_q = max(qs) if len(qs) > 0 else 1
     ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
@@ -182,7 +197,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
     prarm: outpath - path to output dir
     param: {bool} verbose - print debug text if True
     """
-    response = requests.get(gage.data_url())
+    response = requests.get(gage.data_url(), timeout=TIMEOUT)
 
     # Verify we got good stuff back
     if response.status_code != 200:
@@ -214,7 +229,9 @@ def get_usgs_gage(gage, outpath, verbose=False):
                     img_addr = img.get('src')
                 else:
                     raise FailedImageAddr('image address not found for '+gage.gage_id)
-                response = requests.get(img_addr, stream=True, cookies=response.cookies)
+                response = requests.get(
+                    img_addr, stream=True, cookies=response.cookies, timeout=TIMEOUT,
+                )
 
                 outfile = os.path.join(outpath, gage.image_file())
                 with open(outfile, 'wb') as out:
@@ -225,6 +242,8 @@ def get_usgs_gage(gage, outpath, verbose=False):
                 q = pull_val(_next)
                 if verbose:
                     print(f'\tgot: {", ".join(q)} from website')
+                if not util.is_float(q):
+                    continue
 
                 q_outfile = os.path.join(outpath, gage.data_file())
                 with open(q_outfile, 'wt') as out:
@@ -238,7 +257,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
     url = (f'https://waterservices.usgs.gov/nwis/iv/?sites={gage.gage_id}&'
            f'parameterCd={code}&period=P{PLOT_DAYS}D&siteStatus=all&format=json')
 
-    resp = requests.get(url)
+    resp = requests.get(url, timeout=TIMEOUT,)
     if resp.status_code != 200:
         raise ValueError(f'Bad respone ({resp.status_code}) from {url}, got: '
                          f'"{resp.text}"')
@@ -253,9 +272,9 @@ def get_usgs_gage(gage, outpath, verbose=False):
             value = result['value']
             timestamp = result['dateTime']
             date = timestamp.split('T')[0]
-            time = timestamp.split('T')[1].split('-')[0].split('.')[0]
+            time_part = timestamp.split('T')[1].split('-')[0].split('.')[0]
 
-            data = f'{value},{date},{time}'
+            data = f'{value},{date},{time_part}'
             out.write(data+'\n')
 
 
@@ -299,8 +318,8 @@ def get_nsv_gage(gage, outpath, verbose=False):
     datafile = os.path.join(outpath, gage.data_file())
     with open(datafile, 'wt') as f:
         date = nsvq.index[-1].strftime('%Y-%m-%d')
-        time = nsvq.index[-1].strftime('%H:%M:%S')
-        f.write(f'{nsvq[-1]},{date},{time}\n')
+        time_part = nsvq.index[-1].strftime('%H:%M:%S')
+        f.write(f'{nsvq[-1]},{date},{time_part}\n')
 
 def get_foxton_gage(gage, outpath, verbose=False):
     """
@@ -324,8 +343,8 @@ def get_foxton_gage(gage, outpath, verbose=False):
     datafile = os.path.join(outpath, gage.data_file())
     with open(datafile, 'wt') as f:
         date = foxton.index[-1].strftime('%Y-%m-%d')
-        time = foxton.index[-1].strftime('%H:%M:%S')
-        f.write(f'{foxton[-1]},{date},{time}\n')
+        time_part = foxton.index[-1].strftime('%H:%M:%S')
+        f.write(f'{foxton[-1]},{date},{time_part}\n')
 
 
 def get_wildcat_gage(gage, outpath, verbose=False):
@@ -350,8 +369,8 @@ def get_wildcat_gage(gage, outpath, verbose=False):
     datafile = os.path.join(outpath, gage.data_file())
     with open(datafile, 'wt') as f:
         date = wildcat.index[-1].strftime('%Y-%m-%d')
-        time = wildcat.index[-1].strftime('%H:%M:%S')
-        f.write(f'{wildcat[-1]},{date},{time}\n')
+        time_part = wildcat.index[-1].strftime('%H:%M:%S')
+        f.write(f'{wildcat[-1]},{date},{time_part}\n')
 
 def get_prr_gage(gage, outpath, verbose=False):
     """
@@ -362,7 +381,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     prarm: outpath - path to output dir
     """
     # TODO - look for urllib3.exceptions.NewConnectionError
-    response = requests.get(gage.data_url())
+    response = requests.get(gage.data_url(), timeout=TIMEOUT,)
 
     # Verify we got good stuff back
     if response.status_code != 200:
@@ -372,24 +391,24 @@ def get_prr_gage(gage, outpath, verbose=False):
     headers = soup.find_all(class_='entry-header')
 
     # Hazard or accident headers won't match the rock report format, try all headers
-    meta, time = None, None 
+    meta, time_part = None, None
     for header in headers:
         try:
             # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
             stage = header.find('a').getText().split(' ')[2].replace('+', '').replace('-', '')
-            time = header.find('a').getText().split(' ')[4]
+            time_part = header.find('a').getText().split(' ')[4]
 
             # Get date, e.g. 'May 31, 2022 By Camp Falbo '
             meta = header.find('p').getText().split(',')
             mmm_dd = meta[0]
             year = meta[1].strip().split(' ')[0]
-            ts = dt.strptime(f'{mmm_dd} {year} {time}', '%B %d %Y %H%M')
+            ts = dt.strptime(f'{mmm_dd} {year} {time_part}', '%B %d %Y %H%M')
             break
         except (IndexError, ValueError):
             pass
 
-    if meta is None or time is None:
-        print(f'Error pulling PRR: {e}')
+    if meta is None or time_part is None:
+        print(f'Error pulling PRR: meta={meta}, time_part={time_part}')
         return
 
     data = '{},{},{}'.format(stage, ts.date(), ts.time())
@@ -397,6 +416,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     # grab last line of data file if it exists
     datafile = os.path.join(outpath, gage.data_file())
     if os.path.exists(datafile):
+        old_data = ''
         with open(datafile, 'rt') as f:
             for old_data in f:
                 pass
