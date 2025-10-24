@@ -14,9 +14,10 @@ def nav_link_processor():
         @param {str} name - display name of the page, e.g. 'Front Range'
         @returns {str} - <a> tag for link
         """
-        active =  'active' if request.path == path else ''
-        aria_current =  'aria-current="page"' if request.path == path else ''
+        active = "active" if request.path == path else ""
+        aria_current = 'aria-current="page"' if request.path == path else ""
         html = f'<a class="nav-link {active}" {aria_current} href="{path}">{name}</a>'
 
         return html
-    return {'nav_link': nav_link}
+
+    return {"nav_link": nav_link}

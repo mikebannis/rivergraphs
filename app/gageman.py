@@ -20,7 +20,9 @@ class Gage:
     image and URL to the actual gage
     """
 
-    def __init__(self, gage_id, gage_type, river, location, region, menu={}, units=None):
+    def __init__(
+        self, gage_id, gage_type, river, location, region, menu={}, units=None
+    ):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
         # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
@@ -139,7 +141,9 @@ class Gage:
         elif self.gage_type == "WYSEO":
             return "https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Monthly/"
         elif self.gage_type == "DWR":
-            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
+            return (
+                f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
+            )
         else:
             return None
             # return f'Human URL not known for {self.gage_id} {self.gage_type}'

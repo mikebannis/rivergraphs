@@ -26,8 +26,8 @@ PLOT_DAYS = 7  # Days to plot on graph
 GRAPH_TOP_BUFFER = 1.05
 
 USGS_CODE = {
-    'feet': '00065',
-    'cfs': '00060',
+    "feet": "00065",
+    "cfs": "00060",
 }
 
 TIMEOUT = 30  # timeout for get requests, in seconds
@@ -49,53 +49,54 @@ def get_wyseo_gage(gage, outpath, verbose=False):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
-    assert gage.gage_id == '4578', 'This only works for blue grass...'
+    assert gage.gage_id == "4578", "This only works for blue grass..."
 
-    utc = pytz.timezone('UTC')
-    mtn = pytz.timezone('US/Mountain')
-    date_f = '%Y-%m-%dT%H:%M:%SZ'
+    utc = pytz.timezone("UTC")
+    mtn = pytz.timezone("US/Mountain")
+    date_f = "%Y-%m-%dT%H:%M:%SZ"
 
-    start = (dt.now() - timedelta(days=PLOT_DAYS+1)).strftime('%Y-%m-%d')
-    end = (dt.now() + timedelta(days=2)).strftime('%Y-%m-%d')
+    start = (dt.now() - timedelta(days=PLOT_DAYS + 1)).strftime("%Y-%m-%d")
+    end = (dt.now() + timedelta(days=2)).strftime("%Y-%m-%d")
     if verbose:
-        print(f'Getting data for {gage.gage_id} from {start} to {end}')
+        print(f"Getting data for {gage.gage_id} from {start} to {end}")
 
     data = {
-        'sort': 'TimeStamp-asc',
-        'date': start,
-        'endDate': end,
+        "sort": "TimeStamp-asc",
+        "date": start,
+        "endDate": end,
     }
     response = requests.post(
-        'https://seoflow.wyo.gov/Data/DatasetGrid?dataset=4578',
-        data=data, timeout=TIMEOUT,
+        "https://seoflow.wyo.gov/Data/DatasetGrid?dataset=4578",
+        data=data,
+        timeout=TIMEOUT,
     )
 
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
-    results = response.json()['Data']
+    results = response.json()["Data"]
 
     outfile = os.path.join(outpath, gage.data_file())
-    data = ''
-    with open(outfile, 'wt') as out:
+    data = ""
+    with open(outfile, "wt") as out:
         for result in results:
-            q = result['Value']
+            q = result["Value"]
             if not util.is_float(q):
                 continue
 
-            timestamp = utc.localize(dt.strptime(result['TimeStamp'], date_f))
+            timestamp = utc.localize(dt.strptime(result["TimeStamp"], date_f))
             timestamp = timestamp.astimezone(mtn)
-            timestamp_str = timestamp.strftime('%Y-%m-%d,%H:%M:%S')
-            data = f'{q},{timestamp_str}\n'
+            timestamp_str = timestamp.strftime("%Y-%m-%d,%H:%M:%S")
+            data = f"{q},{timestamp_str}\n"
             out.write(data)
 
     if verbose:
-        print(f'\tWrote {len(results)} results to {outfile}')
-        print(f'\tLast result was {data}')
+        print(f"\tWrote {len(results)} results to {outfile}")
+        print(f"\tLast result was {data}")
 
     # --- Plot and save the hydrograph
-    raw_qs = [r['Value'] for r in results]
+    raw_qs = [r["Value"] for r in results]
     raw_tss = [
-        utc.localize(dt.strptime(r['TimeStamp'], date_f)).astimezone(mtn)
+        utc.localize(dt.strptime(r["TimeStamp"], date_f)).astimezone(mtn)
         for r in results
     ]
     make_graph(raw_qs, raw_tss, outpath, gage)
@@ -108,42 +109,48 @@ def get_dwr_graph(gage, outpath, verbose=False):
     param: gage - gageman.Gage instance
     prarm: outpath - path to output dir
     """
-    response = requests.get(gage.data_url(), timeout=TIMEOUT,)
+    response = requests.get(
+        gage.data_url(),
+        timeout=TIMEOUT,
+    )
     if response.status_code == 404:
-        if response.text == 'This URL is properly formatted, but returns zero records from CDSS.':
-            print('\tNo records returned from CDSS.')
+        if (
+            response.text
+            == "This URL is properly formatted, but returns zero records from CDSS."
+        ):
+            print("\tNo records returned from CDSS.")
             return
         else:
             raise URLError(response.status_code, response.text)
     elif response.status_code != 200:
         raise URLError(response.status_code, response.text)
-    results = response.json()['ResultList']
+    results = response.json()["ResultList"]
 
     outfile = os.path.join(outpath, gage.data_file())
-    data = ''
-    with open(outfile, 'wt') as out:
+    data = ""
+    with open(outfile, "wt") as out:
         for result in results:
-            q = result['measValue']
+            q = result["measValue"]
             if not util.is_float(q):
                 continue
 
-            timestamp = result['measDateTime']
-            if not 'T' in timestamp:
+            timestamp = result["measDateTime"]
+            if not "T" in timestamp:
                 continue
-            date = timestamp.split('T')[0]
-            time_part = timestamp.split('T')[1]
+            date = timestamp.split("T")[0]
+            time_part = timestamp.split("T")[1]
 
-            data = f'{q},{date},{time_part}'
-            out.write(data+'\n')
+            data = f"{q},{date},{time_part}"
+            out.write(data + "\n")
 
     if verbose:
-        print(f'\tWrote {len(results)} results to {outfile}')
-        print(f'\tLast result was {data}')
+        print(f"\tWrote {len(results)} results to {outfile}")
+        print(f"\tLast result was {data}")
 
     # --- Plot and save the hydrograph
-    date_f = '%Y-%m-%dT%H:%M:%S'
-    raw_qs = [r['measValue'] for r in results]
-    raw_tss = [dt.strptime(r['measDateTime'], date_f) for r in results]
+    date_f = "%Y-%m-%dT%H:%M:%S"
+    raw_qs = [r["measValue"] for r in results]
+    raw_tss = [dt.strptime(r["measDateTime"], date_f) for r in results]
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
@@ -170,11 +177,11 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
         qs.append(q)
         tss.append(ts)
 
-    fmt = mdates.DateFormatter('%b\n%d')  # May\n5
+    fmt = mdates.DateFormatter("%b\n%d")  # May\n5
     _, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
 
     if len(qs) == 0 or len(tss) == 0:
-        print(f'No data to plot for {gage}')
+        print(f"No data to plot for {gage}")
 
     ax.plot(tss, qs)
 
@@ -203,38 +210,42 @@ def get_usgs_gage(gage, outpath, verbose=False):
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    if gage.units == 'cfs':
-        search = 'Discharge, cubic feet per second'
-    elif gage.units == 'feet':
-        search = 'Gage height, feet'
+    if gage.units == "cfs":
+        search = "Discharge, cubic feet per second"
+    elif gage.units == "feet":
+        search = "Gage height, feet"
     else:
-        raise ValueError('Units for USGS gage must be cfs or feet. Received '
-                         f'{gage.units} for {gage}')
+        raise ValueError(
+            "Units for USGS gage must be cfs or feet. Received "
+            f"{gage.units} for {gage}"
+        )
 
     if verbose:
-        print(f'\tlooking for {search}')
-
+        print(f"\tlooking for {search}")
 
     # Get the discharge
-    for tag in soup.find_all('a'):
-        if tag.get('name') == "gifno-99":
+    for tag in soup.find_all("a"):
+        if tag.get("name") == "gifno-99":
             if tag.getText().strip() == search:
                 parent = tag.parent
 
                 # Grab the graph and save it
-                img = parent.parent.find_next('img')
-                if img.get('alt') == "Graph of ":
-                    img_addr = img.get('src')
+                img = parent.parent.find_next("img")
+                if img.get("alt") == "Graph of ":
+                    img_addr = img.get("src")
                 else:
-                    raise FailedImageAddr('image address not found for '+gage.gage_id)
+                    raise FailedImageAddr("image address not found for " + gage.gage_id)
                 response = requests.get(
-                    img_addr, stream=True, cookies=response.cookies, timeout=TIMEOUT,
+                    img_addr,
+                    stream=True,
+                    cookies=response.cookies,
+                    timeout=TIMEOUT,
                 )
 
                 outfile = os.path.join(outpath, gage.image_file())
-                with open(outfile, 'wb') as out:
+                with open(outfile, "wb") as out:
                     shutil.copyfileobj(response.raw, out)
 
                 # Grab the discharge and save it to a .cfs file
@@ -246,47 +257,54 @@ def get_usgs_gage(gage, outpath, verbose=False):
                     continue
 
                 q_outfile = os.path.join(outpath, gage.data_file())
-                with open(q_outfile, 'wt') as out:
+                with open(q_outfile, "wt") as out:
                     for val in q:
-                        out.write(str(val) + ',')
-                    out.write('\n')
+                        out.write(str(val) + ",")
+                    out.write("\n")
 
     # Pull multiple values and write to file. URL builder at:
     # https://waterservices.usgs.gov/rest/IV-Test-Tool.html
     code = USGS_CODE[gage.units]
-    url = (f'https://waterservices.usgs.gov/nwis/iv/?sites={gage.gage_id}&'
-           f'parameterCd={code}&period=P{PLOT_DAYS}D&siteStatus=all&format=json')
+    url = (
+        f"https://waterservices.usgs.gov/nwis/iv/?sites={gage.gage_id}&"
+        f"parameterCd={code}&period=P{PLOT_DAYS}D&siteStatus=all&format=json"
+    )
 
-    resp = requests.get(url, timeout=TIMEOUT,)
+    resp = requests.get(
+        url,
+        timeout=TIMEOUT,
+    )
     if resp.status_code != 200:
-        raise ValueError(f'Bad respone ({resp.status_code}) from {url}, got: '
-                         f'"{resp.text}"')
+        raise ValueError(
+            f"Bad respone ({resp.status_code}) from {url}, got: " f'"{resp.text}"'
+        )
 
-    results = resp.json()['value']['timeSeries'][0]['values'][0]['value']
+    results = resp.json()["value"]["timeSeries"][0]["values"][0]["value"]
     if verbose:
-        print(f'\tGot {len(results)} results from API. Latest value is: {results[-1]}')
+        print(f"\tGot {len(results)} results from API. Latest value is: {results[-1]}")
 
     outfile = os.path.join(outpath, gage.data_file())
-    with open(outfile, 'wt') as out:
+    with open(outfile, "wt") as out:
         for result in results:
-            value = result['value']
-            timestamp = result['dateTime']
-            date = timestamp.split('T')[0]
-            time_part = timestamp.split('T')[1].split('-')[0].split('.')[0]
+            value = result["value"]
+            timestamp = result["dateTime"]
+            date = timestamp.split("T")[0]
+            time_part = timestamp.split("T")[1].split("-")[0].split(".")[0]
 
-            data = f'{value},{date},{time_part}'
-            out.write(data+'\n')
+            data = f"{value},{date},{time_part}"
+            out.write(data + "\n")
 
 
 def pull_val(text):
-    """ Pull gage values for USGS """
+    """Pull gage values for USGS"""
     fields = text.split()
     for i in range(len(fields)):
-        if fields[i] == 'value:':
+        if fields[i] == "value:":
             try:
-                return (fields[i+1], fields[i+2], fields[i+3])
+                return (fields[i + 1], fields[i + 2], fields[i + 3])
             except IndexError:
-                return ('N/A', 'Gauge appears to be offline', '')
+                return ("N/A", "Gauge appears to be offline", "")
+
 
 def get_nsv_gage(gage, outpath, verbose=False):
     """
@@ -297,16 +315,16 @@ def get_nsv_gage(gage, outpath, verbose=False):
     import pandas as pd
 
     # Proving grounds q - find average flow per hour
-    pgq_g = gageman.get_gage('NSVBBRCO', 'DWR')
-    pgq = pgq_g.series.groupby(pd.Grouper(freq='H')).mean()
+    pgq_g = gageman.get_gage("NSVBBRCO", "DWR")
+    pgq = pgq_g.series.groupby(pd.Grouper(freq="H")).mean()
 
     # Button rock dam af-ft
-    braf_g = gageman.get_gage('BRKDAMCO', 'DWR')
+    braf_g = gageman.get_gage("BRKDAMCO", "DWR")
     # This probably doesn't need to be averaged, but doesn't really hurt either
-    braf = braf_g.series.groupby(pd.Grouper(freq='H')).mean()
+    braf = braf_g.series.groupby(pd.Grouper(freq="H")).mean()
 
     # Calculate approx inflow
-    nsvq = braf.diff()*12 + pgq
+    nsvq = braf.diff() * 12 + pgq
 
     # clip to last 7 days and chop off fake peaks
     mask = nsvq.index > dt.today() - timedelta(days=PLOT_DAYS)
@@ -316,10 +334,11 @@ def get_nsv_gage(gage, outpath, verbose=False):
     make_graph(nsvq.values, nsvq.index, outpath, gage)
 
     datafile = os.path.join(outpath, gage.data_file())
-    with open(datafile, 'wt') as f:
-        date = nsvq.index[-1].strftime('%Y-%m-%d')
-        time_part = nsvq.index[-1].strftime('%H:%M:%S')
-        f.write(f'{nsvq[-1]},{date},{time_part}\n')
+    with open(datafile, "wt") as f:
+        date = nsvq.index[-1].strftime("%Y-%m-%d")
+        time_part = nsvq.index[-1].strftime("%H:%M:%S")
+        f.write(f"{nsvq[-1]},{date},{time_part}\n")
+
 
 def get_foxton_gage(gage, outpath, verbose=False):
     """
@@ -327,12 +346,12 @@ def get_foxton_gage(gage, outpath, verbose=False):
     """
     import pandas as pd
 
-    waterton = gageman.get_gage('PLASPLCO', 'DWR').series
-    deckers = gageman.get_gage('06701900', 'USGS').series
+    waterton = gageman.get_gage("PLASPLCO", "DWR").series
+    deckers = gageman.get_gage("06701900", "USGS").series
     foxton = (waterton - deckers).dropna()
 
     if foxton.size <= 0:
-        raise ValueError('No data points calculated for foxton!')
+        raise ValueError("No data points calculated for foxton!")
 
     # clip to last 7 days
     mask = foxton.index > dt.today() - timedelta(days=PLOT_DAYS)
@@ -341,10 +360,10 @@ def get_foxton_gage(gage, outpath, verbose=False):
     make_graph(foxton.values, foxton.index, outpath, gage)
 
     datafile = os.path.join(outpath, gage.data_file())
-    with open(datafile, 'wt') as f:
-        date = foxton.index[-1].strftime('%Y-%m-%d')
-        time_part = foxton.index[-1].strftime('%H:%M:%S')
-        f.write(f'{foxton[-1]},{date},{time_part}\n')
+    with open(datafile, "wt") as f:
+        date = foxton.index[-1].strftime("%Y-%m-%d")
+        time_part = foxton.index[-1].strftime("%H:%M:%S")
+        f.write(f"{foxton[-1]},{date},{time_part}\n")
 
 
 def get_wildcat_gage(gage, outpath, verbose=False):
@@ -353,12 +372,12 @@ def get_wildcat_gage(gage, outpath, verbose=False):
     """
     import pandas as pd
 
-    cheesman = gageman.get_gage('06700000', 'USGS').series
-    tarryall = gageman.get_gage('TARTARCO', 'DWR').series
+    cheesman = gageman.get_gage("06700000", "USGS").series
+    tarryall = gageman.get_gage("TARTARCO", "DWR").series
     wildcat = (cheesman - tarryall).dropna()
 
     if wildcat.size <= 0:
-        raise ValueError('No data points calculated for wildcat!')
+        raise ValueError("No data points calculated for wildcat!")
 
     # clip to last 7 days
     mask = wildcat.index > dt.today() - timedelta(days=PLOT_DAYS)
@@ -367,10 +386,11 @@ def get_wildcat_gage(gage, outpath, verbose=False):
     make_graph(wildcat.values, wildcat.index, outpath, gage)
 
     datafile = os.path.join(outpath, gage.data_file())
-    with open(datafile, 'wt') as f:
-        date = wildcat.index[-1].strftime('%Y-%m-%d')
-        time_part = wildcat.index[-1].strftime('%H:%M:%S')
-        f.write(f'{wildcat[-1]},{date},{time_part}\n')
+    with open(datafile, "wt") as f:
+        date = wildcat.index[-1].strftime("%Y-%m-%d")
+        time_part = wildcat.index[-1].strftime("%H:%M:%S")
+        f.write(f"{wildcat[-1]},{date},{time_part}\n")
+
 
 def get_prr_gage(gage, outpath, verbose=False):
     """
@@ -381,68 +401,77 @@ def get_prr_gage(gage, outpath, verbose=False):
     prarm: outpath - path to output dir
     """
     # TODO - look for urllib3.exceptions.NewConnectionError
-    response = requests.get(gage.data_url(), timeout=TIMEOUT,)
+    response = requests.get(
+        gage.data_url(),
+        timeout=TIMEOUT,
+    )
 
     # Verify we got good stuff back
     if response.status_code != 200:
         raise URLError(response.status_code, response.text)
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    headers = soup.find_all(class_='entry-header')
+    soup = BeautifulSoup(response.text, "html.parser")
+    headers = soup.find_all(class_="entry-header")
 
     # Hazard or accident headers won't match the rock report format, try all headers
     meta, time_part = None, None
     for header in headers:
         try:
             # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
-            stage = header.find('a').getText().split(' ')[2].replace('+', '').replace('-', '')
-            time_part = header.find('a').getText().split(' ')[4]
+            stage = (
+                header.find("a")
+                .getText()
+                .split(" ")[2]
+                .replace("+", "")
+                .replace("-", "")
+            )
+            time_part = header.find("a").getText().split(" ")[4]
 
             # Get date, e.g. 'May 31, 2022 By Camp Falbo '
-            meta = header.find('p').getText().split(',')
+            meta = header.find("p").getText().split(",")
             mmm_dd = meta[0]
-            year = meta[1].strip().split(' ')[0]
-            ts = dt.strptime(f'{mmm_dd} {year} {time_part}', '%B %d %Y %H%M')
+            year = meta[1].strip().split(" ")[0]
+            ts = dt.strptime(f"{mmm_dd} {year} {time_part}", "%B %d %Y %H%M")
             break
         except (IndexError, ValueError):
             pass
 
     if meta is None or time_part is None:
-        print(f'Error pulling PRR: meta={meta}, time_part={time_part}')
+        print(f"Error pulling PRR: meta={meta}, time_part={time_part}")
         return
 
-    data = '{},{},{}'.format(stage, ts.date(), ts.time())
+    data = "{},{},{}".format(stage, ts.date(), ts.time())
 
     # grab last line of data file if it exists
     datafile = os.path.join(outpath, gage.data_file())
     if os.path.exists(datafile):
-        old_data = ''
-        with open(datafile, 'rt') as f:
+        old_data = ""
+        with open(datafile, "rt") as f:
             for old_data in f:
                 pass
 
         # If it's the same data point, don't do anything else
         if old_data.strip() == data.strip():
             if verbose:
-                print(f'\tData received is same as in data file: {old_data.strip()}')
+                print(f"\tData received is same as in data file: {old_data.strip()}")
             return
 
     if verbose:
-        print(f'\tWriting {data} to {datafile}')
-    with open(datafile, 'at') as out:
-        out.write(data+'\n')
+        print(f"\tWriting {data} to {datafile}")
+    with open(datafile, "at") as out:
+        out.write(data + "\n")
 
     raw_stages = []
     raw_tss = []
-    with open(datafile, 'rt') as f:
+    with open(datafile, "rt") as f:
         for line in f:
-            fields = line.strip().split(',')
+            fields = line.strip().split(",")
             try:
                 raw_stages.append(float(fields[0]))
             except ValueError:
                 print(f'\tCorrupt line found in {datafile}: "{line.strip()}"')
                 continue
-            ts = dt.strptime(f'{fields[1]} {fields[2]}', '%Y-%m-%d %H:%M:%S')
+            ts = dt.strptime(f"{fields[1]} {fields[2]}", "%Y-%m-%d %H:%M:%S")
             raw_tss.append(ts)
 
     make_graph(raw_stages, raw_tss, outpath, gage)
@@ -456,33 +485,33 @@ def main():
     elif len(sys.argv) == 2:
         verbose = True
         gages = gageman.get_gages()
-        if sys.argv[1].lower() == 'dwr':
-            gages = [g for g in gages if g.gage_type == 'DWR']
-        elif sys.argv[1].lower() == 'usgs':
-            gages = [g for g in gages if g.gage_type == 'USGS']
-        elif sys.argv[1].lower() == 'prr':
-            gages = [g for g in gages if g.gage_type == 'PRR']
-        elif sys.argv[1].lower() == 'reverse':
+        if sys.argv[1].lower() == "dwr":
+            gages = [g for g in gages if g.gage_type == "DWR"]
+        elif sys.argv[1].lower() == "usgs":
+            gages = [g for g in gages if g.gage_type == "USGS"]
+        elif sys.argv[1].lower() == "prr":
+            gages = [g for g in gages if g.gage_type == "PRR"]
+        elif sys.argv[1].lower() == "reverse":
             gages = gages[::-1]
-        elif sys.argv[1].lower() == '--verbose':
+        elif sys.argv[1].lower() == "--verbose":
             pass
         else:
-            print(f'Unknown option: {sys.argv[1]}')
+            print(f"Unknown option: {sys.argv[1]}")
             sys.exit()
     elif len(sys.argv) == 3:
         verbose = True
-        if sys.argv[1].lower() == '--id':
+        if sys.argv[1].lower() == "--id":
             gages = gageman.get_gages()
             gages = [g for g in gages if g.gage_id == sys.argv[2]]
         else:
-            print('This isn\'t valid:', sys.argv)
+            print("This isn't valid:", sys.argv)
             sys.exit()
     else:
-        print('This isn\'t valid:', sys.argv)
+        print("This isn't valid:", sys.argv)
         sys.exit()
 
     if len(gages) == 0:
-        print('No matching gages found!!!')
+        print("No matching gages found!!!")
         sys.exit()
 
     outpath = util.static_dir()
@@ -492,42 +521,42 @@ def main():
             time.sleep(LONG_SLEEP)
 
         if verbose:
-            print ('*** working on {} gage: {}'.format(gage.gage_type, gage))
+            print("*** working on {} gage: {}".format(gage.gage_type, gage))
 
         # USGS is a little special, try twice for image
-        if gage.gage_type == 'USGS':
+        if gage.gage_type == "USGS":
             try:
                 get_usgs_gage(gage, outpath, verbose=verbose)
             except FailedImageAddr:
                 try:
                     if verbose:
-                        print ('\tno image address, trying again...')
+                        print("\tno image address, trying again...")
                     time.sleep(LONG_SLEEP)
                     get_usgs_gage(gage, outpath, verbose=verbose)
                 except FailedImageAddr:
                     if verbose:
-                        print ('\tfailed to download gage, skipping')
+                        print("\tfailed to download gage, skipping")
                     continue
             except Exception as e:
-                print(f'\tError getting gage {gage}: {e}')
+                print(f"\tError getting gage {gage}: {e}")
                 continue
 
             if verbose:
-                print ('\tsuccess')
+                print("\tsuccess")
             continue
 
         # Determine gage getter function
-        if gage.gage_type == 'DWR':
+        if gage.gage_type == "DWR":
             getter = get_dwr_graph
-        elif gage.gage_type == 'PRR':
+        elif gage.gage_type == "PRR":
             getter = get_prr_gage
-        elif gage.gage_type == 'WYSEO':
+        elif gage.gage_type == "WYSEO":
             getter = get_wyseo_gage
-        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'NSV':
+        elif gage.gage_type == "VIRTUAL" and gage.gage_id == "NSV":
             getter = get_nsv_gage
-        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'FOXTON':
+        elif gage.gage_type == "VIRTUAL" and gage.gage_id == "FOXTON":
             getter = get_foxton_gage
-        elif gage.gage_type == 'VIRTUAL' and gage.gage_id == 'WILDCAT':
+        elif gage.gage_type == "VIRTUAL" and gage.gage_id == "WILDCAT":
             getter = get_wildcat_gage
         else:
             print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
@@ -536,16 +565,16 @@ def main():
         # If verbose, we're running interactively. Allow exceptions to propagate
         if verbose:
             getter(gage, outpath, verbose=verbose)
-            print ('\tsuccess')
+            print("\tsuccess")
             continue
 
         # Running from cron. Catch exceptions and move on
         try:
             getter(gage, outpath, verbose=verbose)
         except Exception as e:
-            print(f'\tError getting {gage.gage_type} {gage.gage_id}:', e)
+            print(f"\tError getting {gage.gage_type} {gage.gage_id}:", e)
             continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
