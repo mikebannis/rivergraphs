@@ -20,9 +20,7 @@ class Gage:
     image and URL to the actual gage
     """
 
-    def __init__(
-        self, gage_id, gage_type, river, location, region, menu={}, units=None
-    ):
+    def __init__(self, gage_id, gage_type, river, location, region, menu={}, units=None):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
         # like 06716500, for dwr this is PLAGRACO
         self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
@@ -118,7 +116,7 @@ class Gage:
     def data_url(self):
         """Return data API URL for gage"""
         if self.gage_type == "USGS":
-            return "https://waterdata.usgs.gov/nwis/uv?site_no=" + self.gage_id
+            return f"https://waterdata.usgs.gov/nwis/uv?site_no={self.gage_id}"
         elif self.gage_type == "PRR":
             return "http://www.poudrerockreport.com/"
         elif self.gage_type == "DWR":
@@ -126,8 +124,8 @@ class Gage:
             param = "STORAGE" if self.gage_id == "BRKDAMCO" else "DISCHRG"
             return (
                 "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/"
-                + "telemetrytimeseriesraw/?format=json&abbrev="
-                + f"{self.gage_id}&parameter={param}"
+                "telemetrytimeseriesraw/?format=json&abbrev="
+                f"{self.gage_id}&parameter={param}"
             )
         else:
             return f"Data URL not known for {self.gage_id} {self.gage_type}"
@@ -141,9 +139,7 @@ class Gage:
         elif self.gage_type == "WYSEO":
             return "https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Monthly/"
         elif self.gage_type == "DWR":
-            return (
-                f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
-            )
+            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
         else:
             return None
             # return f'Human URL not known for {self.gage_id} {self.gage_type}'

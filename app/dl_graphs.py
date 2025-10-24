@@ -16,6 +16,7 @@ from pandas.plotting import register_matplotlib_converters
 
 import gageman
 import util
+import traceback
 
 register_matplotlib_converters()
 
@@ -95,10 +96,7 @@ def get_wyseo_gage(gage, outpath, verbose=False):
 
     # --- Plot and save the hydrograph
     raw_qs = [r["Value"] for r in results]
-    raw_tss = [
-        utc.localize(dt.strptime(r["TimeStamp"], date_f)).astimezone(mtn)
-        for r in results
-    ]
+    raw_tss = [utc.localize(dt.strptime(r["TimeStamp"], date_f)).astimezone(mtn) for r in results]
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
@@ -114,10 +112,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
         timeout=TIMEOUT,
     )
     if response.status_code == 404:
-        if (
-            response.text
-            == "This URL is properly formatted, but returns zero records from CDSS."
-        ):
+        if response.text == "This URL is properly formatted, but returns zero records from CDSS.":
             print("\tNo records returned from CDSS.")
             return
         else:
@@ -218,8 +213,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
         search = "Gage height, feet"
     else:
         raise ValueError(
-            "Units for USGS gage must be cfs or feet. Received "
-            f"{gage.units} for {gage}"
+            "Units for USGS gage must be cfs or feet. Received " f"{gage.units} for {gage}"
         )
 
     if verbose:
@@ -236,7 +230,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
                 if img.get("alt") == "Graph of ":
                     img_addr = img.get("src")
                 else:
-                    raise FailedImageAddr("image address not found for " + gage.gage_id)
+                    raise FailedImageAddr(f"image address not found for {gage.gage_id}")
                 response = requests.get(
                     img_addr,
                     stream=True,
@@ -275,9 +269,7 @@ def get_usgs_gage(gage, outpath, verbose=False):
         timeout=TIMEOUT,
     )
     if resp.status_code != 200:
-        raise ValueError(
-            f"Bad respone ({resp.status_code}) from {url}, got: " f'"{resp.text}"'
-        )
+        raise ValueError(f"Bad respone ({resp.status_code}) from {url}, got: " f'"{resp.text}"')
 
     results = resp.json()["value"]["timeSeries"][0]["values"][0]["value"]
     if verbose:
@@ -418,13 +410,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     for header in headers:
         try:
             # Get the stage and time from header text, e.g. 'Pine View 3.4 at 0700'
-            stage = (
-                header.find("a")
-                .getText()
-                .split(" ")[2]
-                .replace("+", "")
-                .replace("-", "")
-            )
+            stage = header.find("a").getText().split(" ")[2].replace("+", "").replace("-", "")
             time_part = header.find("a").getText().split(" ")[4]
 
             # Get date, e.g. 'May 31, 2022 By Camp Falbo '
@@ -502,7 +488,7 @@ def main():
         verbose = True
         if sys.argv[1].lower() == "--id":
             gages = gageman.get_gages()
-            gages = [g for g in gages if g.gage_id == sys.argv[2]]
+            gages = [g for g in gages if str(g.gage_id) == str(sys.argv[2])]
         else:
             print("This isn't valid:", sys.argv)
             sys.exit()
@@ -539,6 +525,7 @@ def main():
                     continue
             except Exception as e:
                 print(f"\tError getting gage {gage}: {e}")
+                traceback.print_exc()
                 continue
 
             if verbose:
@@ -573,6 +560,7 @@ def main():
             getter(gage, outpath, verbose=verbose)
         except Exception as e:
             print(f"\tError getting {gage.gage_type} {gage.gage_id}:", e)
+            traceback.print_exc()
             continue
 
 
