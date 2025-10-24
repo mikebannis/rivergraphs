@@ -1,12 +1,12 @@
 ######## Front Range  ##############################
-- gage_id: '06716500'
+- gage_id: "06716500"
   type: USGS
   river: Clear Creek
   location: Dumont
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
 - gage_id: 06719505
   type: USGS
   river: Clear Creek
@@ -14,7 +14,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
 - gage_id: CHUDITCO
   type: DWR
   river: Clear Creek
@@ -22,7 +22,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Clear
 - gage_id: PRR
   type: PRR
   river: Cache la Poudre
@@ -30,7 +30,7 @@
   region: FR
   units: feet
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Cache%20La%20Poudre
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Cache%20La%20Poudre
 - gage_id: ROBTUNCO
   type: DWR
   river: North Fork South Platte
@@ -49,7 +49,7 @@
   location: Eleven Mile Canyon
   region: FR
   units: cfs
-- gage_id: '06700000'
+- gage_id: "06700000"
   type: USGS
   river: South Fork South Platte
   location: Above Cheesman Lake
@@ -67,7 +67,7 @@
   location: Waterton Canyon
   region: FR
   units: cfs
-- gage_id: '06710247'
+- gage_id: "06710247"
   type: USGS
   river: South Platte
   location: Below Union Ave
@@ -80,7 +80,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
 - gage_id: BOCPINCO
   type: DWR
   river: Boulder Creek
@@ -88,7 +88,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
 - gage_id: BOCBGRCO
   type: DWR
   river: Boulder Creek
@@ -96,7 +96,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
 - gage_id: BOCELSCO
   type: DWR
   river: Boulder Creek
@@ -104,7 +104,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Boulder
 - gage_id: NSVBBRCO
   type: DWR
   river: Saint Vrain
@@ -112,7 +112,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Saint%20Vrain
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Saint%20Vrain
 - gage_id: BRKDAMCO
   type: DWR
   river: Saint Vrain
@@ -120,7 +120,7 @@
   region: FR
   units: ac-ft
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Saint%20Vrain
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Saint%20Vrain
 - gage_id: BTBLESCO
   type: DWR
   river: Big Thompson
@@ -128,7 +128,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
 - gage_id: BTNFDRCO
   type: DWR
   river: Big Thompson
@@ -136,7 +136,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
 - gage_id: BTABCMCO
   type: DWR
   river: Big Thompson
@@ -144,7 +144,7 @@
   region: FR
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Big%20Thompson
 - gage_id: LAPLODCO
   type: DWR
   river: Big South
@@ -166,7 +166,7 @@
   region: Ark
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 07087050
   type: USGS
   river: Arkansas River
@@ -174,7 +174,7 @@
   region: Ark
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 07091200
   type: USGS
   river: Arkansas River
@@ -182,7 +182,7 @@
   region: Ark
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 07094500
   type: USGS
   river: Arkansas River
@@ -190,7 +190,7 @@
   region: Ark
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: LAKATLCO
   type: DWR
   river: Lake Creek
@@ -230,7 +230,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 09057500
   type: USGS
   river: Blue River
@@ -238,7 +238,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 09050100
   type: USGS
   river: Ten Mile Crk
@@ -246,7 +246,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 - gage_id: 09047500
   type: USGS
   river: Snake River
@@ -254,7 +254,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20Arkansas%20Headwaters
 
 - gage_id: 09151500
   type: USGS
@@ -263,7 +263,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Uncompahgre%20Plateau
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Uncompahgre%20Plateau
 - gage_id: 09058000
   type: USGS
   river: Colorado River
@@ -283,7 +283,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Roaring%20Fork
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Roaring%20Fork
 - gage_id: 09064600
   type: USGS
   river: Eagle River
@@ -291,7 +291,7 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Eagle
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Eagle
 - gage_id: 09076300
   type: USGS
   river: Roaring Fork
@@ -299,14 +299,14 @@
   region: Central
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Roaring%20Fork
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Roaring%20Fork
 - gage_id: 09112200
   type: USGS
   river: Upper East
   location: Below Cement Creek
   region: Central
   units: cfs
-- gage_id: '385106106571000'
+- gage_id: "385106106571000"
   type: USGS
   river: Slate River
   location: Near Crested Butte
@@ -331,7 +331,7 @@
   region: Durango
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
 
 - gage_id: 09359500
   type: USGS
@@ -340,7 +340,7 @@
   region: Durango
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
 - gage_id: 09361500
   type: USGS
   river: Animas River
@@ -348,7 +348,7 @@
   region: Durango
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Animas
 - gage_id: 09349800
   type: USGS
   river: Piedra
@@ -357,15 +357,15 @@
   units: cfs
 
 ############## multiday stuff ###########################
-- gage_id: '13309220'
+- gage_id: "13309220"
   type: USGS
   river: Middle Fork Salmon
   location: MF Lodge
   region: Multi
   units: feet
   menu:
-    forecast_url: https://water.weather.gov/ahps2/hydrograph.php?wfo=boi&gage=midi1
-    swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCid2_8/middle_fork_salmon.html
+      forecast_url: https://water.weather.gov/ahps2/hydrograph.php?wfo=boi&gage=midi1
+      swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCid2_8/middle_fork_salmon.html
 - gage_id: 09163500
   type: USGS
   river: Colorado River
@@ -373,8 +373,8 @@
   region: Multi
   units: cfs
   menu:
-    swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUC6/140100_Colorado_Headwaters.html
-    forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=CCUC2&linear_flow=0
+      swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUC6/140100_Colorado_Headwaters.html
+      forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=CCUC2&linear_flow=0
 - gage_id: 09234500
   type: USGS
   river: Green River
@@ -388,7 +388,7 @@
   region: Multi
   units: cfs
   menu:
-    forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=GRVU1&linear_flow=0
+      forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=GRVU1&linear_flow=0
 - gage_id: 09168730
   type: USGS
   river: Dolores River
@@ -396,7 +396,7 @@
   region: Multi
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Dolores
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Dolores
 - gage_id: 09379500
   type: USGS
   river: San Juan River
@@ -404,16 +404,8 @@
   region: Multi
   units: cfs
   menu:
-    forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=BFFU1&linear_flow=0
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20San%20Juan
-- gage_id: 09330500
-  type: USGS
-  river: Muddy Creek
-  location: Near Emery
-  region: Multi
-  units: cfs
-  menu:
-    swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCut2_8/muddy.html
+      forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=BFFU1&linear_flow=0
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=Upper%20San%20Juan
 - gage_id: 09497500
   type: USGS
   river: Salt River
@@ -421,27 +413,49 @@
   region: Multi
   units: cfs
   menu:
-    forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=SLCA3&linear_flow=0
-    swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCaz2_8/upper_salt.html
-- gage_id: '06620000'
+      forecast_url: https://www.cbrfc.noaa.gov/dbdata/station/flowgraph/flowgraph_hc.html?id=SLCA3&linear_flow=0
+      swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCaz2_8/upper_salt.html
+- gage_id: "06620000"
   type: USGS
   river: North Platte River
   location: Near Northgate CO
   region: Multi
   units: cfs
   menu:
-    swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=North%20Platte%20Headwaters
+      swe_plot: https://www.wcc.nrcs.usda.gov/ftpref/support/states/CO/products/#state=co&element=wteq&stationBasin=North%20Platte%20Headwaters
 - gage_id: 09380000
   type: USGS
   river: Colorado River
   location: Lee's Ferry
   region: Multi
   units: cfs
+
+############## packraft stuff ###########################
+- gage_id: 09330500
+  type: USGS
+  river: Muddy Creek
+  location: Near Emery
+  region: Packraft
+  units: cfs
+  menu:
+      swe_plot: https://nwcc-apps.sc.egov.usda.gov/awdb/basin-plots/POR/WTEQ/assocHUCut2_8/muddy.html
+- gage_id: 09333500
+  type: USGS
+  river: Dirty Devil River
+  location: Poison Spider Wash near Hanksville
+  region: Packraft
+  units: cfs
 - gage_id: 09405500
   type: USGS
-  river: North Fork Virgin
-  location: Zion
-  region: Multi
+  river: North Fork Virgin River
+  location: Springdale UT - Zion
+  region: Packraft
+  units: cfs
+- gage_id: 13181000
+  type: USGS
+  river: Owyhee River
+  location: Near Rome OR
+  region: Packraft
   units: cfs
 
 ############## West Virginy ###########################
@@ -469,7 +483,7 @@
   location: Nallen
   region: WV
   units: cfs
-- gage_id: '03076500'
+- gage_id: "03076500"
   type: USGS
   river: Upper Youghiogheny
   location: Friendsville, MD
@@ -481,7 +495,7 @@
   location: Near Richwood
   region: WV
   units: cfs
-- gage_id: '03057000'
+- gage_id: "03057000"
   type: USGS
   river: Tygart Valley River
   location: Colfax
@@ -489,7 +503,7 @@
   units: cfs
 
 ############## Wyoming ###########################
-- gage_id: '4578'
+- gage_id: "4578"
   type: WYSEO
   river: Wheatland Tunnel
   location: Blue Grass Creek

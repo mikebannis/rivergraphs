@@ -2,6 +2,7 @@ import json
 import sys, os
 from collections import defaultdict
 from flask import render_template, url_for, make_response, request
+
 sys.path.append(os.path.dirname(__file__))
 
 import gageman
@@ -9,21 +10,20 @@ from app import app
 
 CURRENT_FAVS_VER = 0.06
 DEFAULT_FAVORITES = {
-    'version':  CURRENT_FAVS_VER,
-    'gages': [
-        { 'type': 'DWR', 'id': 'BTBLESCO'},  # Big Thompson
-        { 'type': 'USGS', 'id': '09128000'},  # Black canyon
-        { 'type': 'VIRTUAL', 'id': 'WILDCAT'},
-        { 'type': 'WYSEO', 'id': '4578'},  # Blue grass
-        { 'type': 'USGS', 'id': '09352900'},  # Vallecito
-        { 'type': 'PRR', 'id': 'PRR'},  # Vallecito
-
-        { 'type': 'USGS', 'id': '06719505'},  # Black Rock
-        { 'type': 'DWR', 'id': 'PLABAICO'},  # Bailey
-        { 'type': 'USGS', 'id': '09058000'},  # Gore
-        { 'type': 'USGS', 'id': '09151500'},  # Escalante
-        { 'type': 'USGS', 'id': '08263500'},  # Upper Taos
-    ]
+    "version": CURRENT_FAVS_VER,
+    "gages": [
+        {"type": "DWR", "id": "BTBLESCO"},  # Big Thompson
+        {"type": "USGS", "id": "09128000"},  # Black canyon
+        {"type": "VIRTUAL", "id": "WILDCAT"},
+        {"type": "WYSEO", "id": "4578"},  # Blue grass
+        {"type": "USGS", "id": "09352900"},  # Vallecito
+        {"type": "PRR", "id": "PRR"},  # Vallecito
+        {"type": "USGS", "id": "06719505"},  # Black Rock
+        {"type": "DWR", "id": "PLABAICO"},  # Bailey
+        {"type": "USGS", "id": "09058000"},  # Gore
+        {"type": "USGS", "id": "09151500"},  # Escalante
+        {"type": "USGS", "id": "08263500"},  # Upper Taos
+    ],
 }
 
 
@@ -36,70 +36,84 @@ def get_favorite_gages():
         True if cookie is missing or out of date
     """
     bad_cookie = False
-    if 'favorites' in request.cookies:
-        favs = json.loads(request.cookies['favorites'])
+    if "favorites" in request.cookies:
+        favs = json.loads(request.cookies["favorites"])
     else:
         favs = DEFAULT_FAVORITES
         bad_cookie = True
 
-    if 'version' not in favs or float(favs['version']) != CURRENT_FAVS_VER:
+    if "version" not in favs or float(favs["version"]) != CURRENT_FAVS_VER:
         favs = DEFAULT_FAVORITES
         bad_cookie = True
 
     try:
-        gages = [gageman.get_gage(_type=f['type'], _id=f['id']) for f in favs['gages']]
+        gages = [gageman.get_gage(_type=f["type"], _id=f["id"]) for f in favs["gages"]]
     except ValueError:
         bad_cookie = True
         favs = DEFAULT_FAVORITES
-        gages = [gageman.get_gage(_type=f['type'], _id=f['id']) for f in favs['gages']]
+        gages = [gageman.get_gage(_type=f["type"], _id=f["id"]) for f in favs["gages"]]
 
     return gages, bad_cookie
 
 
-@app.route('/snotel')
+@app.route("/snotel")
 def snotel():
-    return render_template('snotel.html.j2')
+    return render_template("snotel.html.j2")
 
-@app.route('/flows')
-@app.route('/')
-@app.route('/index')
+
+@app.route("/flows")
+@app.route("/")
+@app.route("/index")
 def flows():
     gages, bad_cookie = get_favorite_gages()
     rivers = gageman.get_rivers(gages)
 
-    resp = make_response(render_template('favorite_flows.html.j2', rivers=rivers))
+    resp = make_response(render_template("favorite_flows.html.j2", rivers=rivers))
 
     if bad_cookie:
-        resp.set_cookie('favorites', json.dumps(DEFAULT_FAVORITES))
+        resp.set_cookie("favorites", json.dumps(DEFAULT_FAVORITES))
     return resp
 
-@app.route('/arkansas')
+
+@app.route("/arkansas")
 def arkansas():
-    return template_for_region('Ark')
+    return template_for_region("Ark")
 
-@app.route('/front_range')
+
+@app.route("/front_range")
 def front_range():
-    return template_for_region('FR')
+    return template_for_region("FR")
 
-@app.route('/durango')
+
+@app.route("/durango")
 def durango():
-    return template_for_region('Durango')
+    return template_for_region("Durango")
 
-@app.route('/multiday')
+
+@app.route("/multiday")
 def multiday():
-    return template_for_region('Multi')
+    return template_for_region("Multi")
 
-@app.route('/central')
+
+@app.route("/packraft")
+def packraft():
+    return template_for_region("Packraft")
+
+
+@app.route("/central")
 def central():
-    return template_for_region('Central')
+    return template_for_region("Central")
 
-@app.route('/west_virginia')
+
+@app.route("/west_virginia")
 def wv():
-    return template_for_region('WV')
+    return template_for_region("WV")
 
-@app.route('/wyoming')
+
+@app.route("/wyoming")
 def wyoming():
-    return template_for_region('WY')
+    return template_for_region("WY")
+
 
 def template_for_region(region):
     """
@@ -111,4 +125,4 @@ def template_for_region(region):
     gages = gageman.get_gages()
     gages = [g for g in gages if g.region == region]
     rivers = gageman.get_rivers(gages)
-    return render_template('flows.html.j2', rivers=rivers)
+    return render_template("flows.html.j2", rivers=rivers)
