@@ -223,6 +223,12 @@
   units: cfs
 
 ######## Central Mountains ##############################
+- gage_id: 09251000
+  type: USGS
+  river: Yampa River - Cross Mountain Gorge
+  location: Near Maybell, CO
+  region: Central
+  units: cfs
 - gage_id: 09050700
   type: USGS
   river: Blue River
@@ -357,6 +363,12 @@
   units: cfs
 
 ############## multiday stuff ###########################
+- gage_id: 09260050
+  type: USGS
+  river: Yampa River
+  location: Deerlodge Park, CO
+  region: Multi
+  units: cfs
 - gage_id: "13309220"
   type: USGS
   river: Middle Fork Salmon
