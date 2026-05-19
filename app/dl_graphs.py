@@ -482,8 +482,8 @@ def main():
             gages = [g for g in gages if g.gage_type == "PRR"]
         elif sys.argv[1].lower() == "reverse":
             gages = gages[::-1]
-        elif sys.argv[1].lower() == "--verbose":
-            pass
+        elif sys.argv[1].lower() == "--verbose" or sys.argv[1].lower() == "-v":
+            verbose = True
         else:
             print(f"Unknown option: {sys.argv[1]}")
             sys.exit()

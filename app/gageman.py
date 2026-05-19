@@ -129,7 +129,10 @@ class Gage:
             return (
                 "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/"
                 "telemetrytimeseriesraw/?format=json&abbrev="
-                f"{self.gage_id}&parameter={param}&apiKey={CODWR_API_KEY}"
+                f"{self.gage_id}&"
+                f"parameter={param}&"
+                f"startDate=-2days&"
+                f"apiKey={CODWR_API_KEY}"
             )
         else:
             return f"Data URL not known for {self.gage_id} {self.gage_type}"
