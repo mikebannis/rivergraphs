@@ -17,6 +17,9 @@ CODWR_API_KEY = os.environ.get("CODWR_API_KEY", "")
 if not CODWR_API_KEY:
     print("Warning: CODWR_API_KEY not set")
 
+NUM_DAYS_FOR_CODWR = 10
+""" Number of days of data to pull for CO DWR gages """
+
 
 class Gage:
     """
@@ -131,7 +134,7 @@ class Gage:
                 "telemetrytimeseriesraw/?format=json&abbrev="
                 f"{self.gage_id}&"
                 f"parameter={param}&"
-                f"startDate=-2days&"
+                f"startDate=-{NUM_DAYS_FOR_CODWR}days&"
                 f"apiKey={CODWR_API_KEY}"
             )
         else:
