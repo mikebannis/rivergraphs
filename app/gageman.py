@@ -13,6 +13,10 @@ GAGE_TYPES = ["USGS", "DWR", "PRR", "WYSEO", "VIRTUAL"]
 # Age of data in hours before old data warning is displayed
 OLD_DATA_HOURS = 6
 
+CODWR_API_KEY = os.environ.get("CODWR_API_KEY", "")
+if not CODWR_API_KEY:
+    print("Warning: CODWR_API_KEY not set")
+
 
 class Gage:
     """
@@ -125,7 +129,7 @@ class Gage:
             return (
                 "https://dwr.state.co.us/Rest/GET/api/v2/telemetrystations/"
                 "telemetrytimeseriesraw/?format=json&abbrev="
-                f"{self.gage_id}&parameter={param}"
+                f"{self.gage_id}&parameter={param}&apiKey={CODWR_API_KEY}"
             )
         else:
             return f"Data URL not known for {self.gage_id} {self.gage_type}"
@@ -139,7 +143,7 @@ class Gage:
         elif self.gage_type == "WYSEO":
             return "https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Monthly/"
         elif self.gage_type == "DWR":
-            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
+            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG&apiKey={CODWR_API_KEY}"
         else:
             return None
             # return f'Human URL not known for {self.gage_id} {self.gage_type}'

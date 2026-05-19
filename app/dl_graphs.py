@@ -13,6 +13,9 @@ from datetime import datetime as dt
 import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
 from pandas.plotting import register_matplotlib_converters
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import gageman
 import util
