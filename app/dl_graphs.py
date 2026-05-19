@@ -6,6 +6,7 @@ import sys
 import time
 import pytz
 import shutil
+import math
 import requests
 from bs4 import BeautifulSoup
 from datetime import timedelta
@@ -167,14 +168,22 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     tss = []
     delta = timedelta(days=PLOT_DAYS)
     for q, ts in zip(raw_qs, raw_tss):
+        # Filter by date
         if raw_tss[-1] - ts > delta:
             continue
-        if not util.is_float(q):
-            continue
+
+        # Ensure it's not None
         if q is None:
             continue
-        qs.append(q)
-        tss.append(ts)
+
+        # Convert to float and filter out NaNs or invalid strings
+        try:
+            val = float(q)
+            if not math.isnan(val):
+                qs.append(val)
+                tss.append(ts)
+        except (TypeError, ValueError):
+            pass
 
     fmt = mdates.DateFormatter("%b\n%d")  # May\n5
     _, ax = plt.subplots(1, figsize=(5.76, 3.84), dpi=100)
