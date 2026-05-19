@@ -4,7 +4,7 @@ import yaml
 import os.path
 from collections import defaultdict
 from datetime import datetime as dt
-from typing import Union
+from typing import Union, List
 
 import pandas as pd
 
@@ -220,7 +220,7 @@ class Gage:
         )
 
 
-def get_gages() -> list[Gage]:
+def get_gages() -> List[Gage]:
     """
     Load gages from gage files
 
