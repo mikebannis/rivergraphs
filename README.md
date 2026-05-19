@@ -33,3 +33,11 @@ $ cd /var/www/rivergraphs
 $ git pull
 $ sudo service apache2 restart
 ```
+
+### Package install
+
+To install a package on the server, run:
+
+```
+sudo /usr/bin/python3 -m pip install <package> --system
+```

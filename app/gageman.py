@@ -143,7 +143,7 @@ class Gage:
         elif self.gage_type == "WYSEO":
             return "https://seoflow.wyo.gov/Data/DataSet/Chart/Location/014CWT/DataSet/Discharge/Tunnel/Interval/Monthly/"
         elif self.gage_type == "DWR":
-            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG&apiKey={CODWR_API_KEY}"
+            return f"https://dwr.state.co.us/Tools/Stations/{self.gage_id}?params=DISCHRG"
         else:
             return None
             # return f'Human URL not known for {self.gage_id} {self.gage_type}'
