@@ -27,10 +27,19 @@ class Gage:
     image and URL to the actual gage
     """
 
-    def __init__(self, gage_id, gage_type, river, location, region, menu={}, units=None):
+    def __init__(
+        self,
+        gage_id: str,
+        gage_type: str,
+        river: str,
+        location: str,
+        region: str,
+        menu={},
+        units=None,
+    ):
         self.gage_id = gage_id  # id for gage (string), for usgs this looks
         # like 06716500, for dwr this is PLAGRACO
-        self.gage_type = gage_type  # either 'USGS' or 'DWR' (string)
+        self.gage_type = gage_type  # Type of gage: 'USGS', 'DWR', etc
         self.river = river  # name of river/creek (string)
         self.location = location  # location of gage (string)
         self.region = region  # region the gage is located in (FR, Ark, etc)
@@ -211,7 +220,7 @@ class Gage:
         )
 
 
-def get_gages():
+def get_gages() -> list[Gage]:
     """
     Load gages from gage files
 

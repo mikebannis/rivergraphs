@@ -14,6 +14,7 @@ import matplotlib.dates as mdates
 from matplotlib import pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 from dotenv import load_dotenv
+import click
 
 load_dotenv()
 
@@ -466,51 +467,23 @@ def get_prr_gage(gage, outpath, verbose=False):
     make_graph(raw_stages, raw_tss, outpath, gage)
 
 
-def main():
-    verbose = False
+def _process_gages(gages: list, outpath: str, verbose: bool) -> None:
+    """Process a list of gages and download their data.
 
-    if len(sys.argv) == 1:
-        gages = gageman.get_gages()
-    elif len(sys.argv) == 2:
-        verbose = True
-        gages = gageman.get_gages()
-        if sys.argv[1].lower() == "dwr":
-            gages = [g for g in gages if g.gage_type == "DWR"]
-        elif sys.argv[1].lower() == "usgs":
-            gages = [g for g in gages if g.gage_type == "USGS"]
-        elif sys.argv[1].lower() == "prr":
-            gages = [g for g in gages if g.gage_type == "PRR"]
-        elif sys.argv[1].lower() == "reverse":
-            gages = gages[::-1]
-        elif sys.argv[1].lower() == "--verbose" or sys.argv[1].lower() == "-v":
-            verbose = True
-        else:
-            print(f"Unknown option: {sys.argv[1]}")
-            sys.exit()
-    elif len(sys.argv) == 3:
-        verbose = True
-        if sys.argv[1].lower() == "--id":
-            gages = gageman.get_gages()
-            gages = [g for g in gages if str(g.gage_id) == str(sys.argv[2])]
-        else:
-            print("This isn't valid:", sys.argv)
-            sys.exit()
-    else:
-        print("This isn't valid:", sys.argv)
-        sys.exit()
-
+    :param gages: List of Gage objects to process
+    :param outpath: Output directory path
+    :param verbose: Whether to print verbose output
+    """
     if len(gages) == 0:
-        print("No matching gages found!!!")
-        sys.exit()
-
-    outpath = util.static_dir()
+        click.echo("No matching gages found!!!")
+        sys.exit(1)
 
     for i, gage in enumerate(gages):
         if i > 0 and not verbose:
             time.sleep(LONG_SLEEP)
 
         if verbose:
-            print("*** working on {} gage: {}".format(gage.gage_type, gage))
+            click.echo(f"*** working on {gage.gage_type} gage: {gage}")
 
         # USGS is a little special, try twice for image
         if gage.gage_type == "USGS":
@@ -519,20 +492,20 @@ def main():
             except FailedImageAddr:
                 try:
                     if verbose:
-                        print("\tno image address, trying again...")
+                        click.echo("\tno image address, trying again...")
                     time.sleep(LONG_SLEEP)
                     get_usgs_gage(gage, outpath, verbose=verbose)
                 except FailedImageAddr:
                     if verbose:
-                        print("\tfailed to download gage, skipping")
+                        click.echo("\tfailed to download gage, skipping")
                     continue
             except Exception as e:
-                print(f"\tError getting gage {gage}: {e}")
+                click.echo(f"\tError getting gage {gage}: {e}")
                 traceback.print_exc()
                 continue
 
             if verbose:
-                print("\tsuccess")
+                click.echo("\tsuccess")
             continue
 
         # Determine gage getter function
@@ -549,22 +522,62 @@ def main():
         elif gage.gage_type == "VIRTUAL" and gage.gage_id == "WILDCAT":
             getter = get_wildcat_gage
         else:
-            print(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
+            click.echo(f'ERROR: unknown gage: "{gage.gage_type}" "{gage.gage_id}"')
             continue
 
         # If verbose, we're running interactively. Allow exceptions to propagate
         if verbose:
             getter(gage, outpath, verbose=verbose)
-            print("\tsuccess")
+            click.echo("\tsuccess")
             continue
 
         # Running from cron. Catch exceptions and move on
         try:
             getter(gage, outpath, verbose=verbose)
         except Exception as e:
-            print(f"\tError getting {gage.gage_type} {gage.gage_id}:", e)
+            click.echo(f"\tError getting {gage.gage_type} {gage.gage_id}: {e}", err=True)
             traceback.print_exc()
             continue
+
+
+@click.command()
+@click.option(
+    "--type",
+    type=click.Choice(["dwr", "usgs", "prr", "wyseo", "virtual"], case_sensitive=False),
+    help="Filter gages by type",
+)
+@click.option(
+    "-i",
+    "--id",
+    multiple=True,
+    help="Download data for specific gage ID(s). Can be used multiple times.",
+)
+@click.option("--reverse", is_flag=True, help="Process gages in reverse order")
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    help="Enable verbose output",
+)
+def main(type: str, id: tuple, reverse: bool, verbose: bool) -> None:
+    """Download gage data and generate graphs."""
+    if type and id:
+        raise click.UsageError("Cannot use --type and --id together")
+
+    gages = gageman.get_gages()
+
+    if type:
+        gages = [g for g in gages if g.gage_type.lower() == type.lower()]
+        verbose = True
+    elif id:
+        gages = [g for g in gages if str(g.gage_id) in id]
+        verbose = True
+    elif reverse:
+        gages = gages[::-1]
+        verbose = True
+
+    outpath = util.static_dir()
+    _process_gages(gages, outpath, verbose)
 
 
 if __name__ == "__main__":

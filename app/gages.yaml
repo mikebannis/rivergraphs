@@ -469,6 +469,12 @@
   location: Near Rome OR
   region: Packraft
   units: cfs
+- gage_id: 09188500
+  type: USGS
+  river: Green River
+  location: Warren Bridge, Near Daniel, WY
+  region: Packraft
+  units: cfs
 
 ############## West Virginy ###########################
 - gage_id: 03192000
