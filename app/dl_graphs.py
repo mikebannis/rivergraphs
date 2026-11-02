@@ -231,7 +231,7 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
                 marker="^",
                 markersize=6,
                 markerfacecolor="none",
-                markeredgecolor="#333333",
+                markeredgecolor="tan",
                 markeredgewidth=1.2,
                 linestyle="none",
                 zorder=3,
@@ -243,7 +243,20 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
     max_q = max(qs) if len(qs) > 0 else 1
     if overlay_vals:
         max_q = max(max_q, max(overlay_vals))
-    ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
+
+    # USGS cfs gages (the ones with a median overlay) get a log y-axis,
+    # matching the old USGS-scraped graph's style. A log axis can't show
+    # zero/negative values, so the lower bound comes from the smallest
+    # positive value instead of 0, with the same GRAPH_TOP_BUFFER ratio
+    # applied as padding below it (dividing, not subtracting, since equal
+    # visual padding on a log scale means equal ratios, not equal amounts).
+    if medians and medians.get("values"):
+        ax.set_yscale("log")
+        positive_vals = [v for v in qs + overlay_vals if v > 0]
+        min_q = min(positive_vals) if positive_vals else 1
+        ax.set_ylim(ymin=min_q / GRAPH_TOP_BUFFER, ymax=max_q * GRAPH_TOP_BUFFER)
+    else:
+        ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
 
