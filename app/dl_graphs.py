@@ -37,6 +37,8 @@ USGS_CODE = {
     "cfs": "00060",
 }
 
+USGS_MISSING_VALUE = -999999  # USGS's own "no data" sentinel value
+
 TIMEOUT = 30  # timeout for get requests, in seconds
 
 MEDIAN_CACHE_FILE = "usgs_medians.json"
@@ -251,10 +253,16 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
     # positive value instead of 0, with the same GRAPH_TOP_BUFFER ratio
     # applied as padding below it (dividing, not subtracting, since equal
     # visual padding on a log scale means equal ratios, not equal amounts).
-    if medians and medians.get("values"):
+    # min_q/max_q are derived only from positive values here -- a reading
+    # can carry USGS's -999999 "no data" sentinel (or similar garbage) that
+    # slipped past upstream filtering, and log10() of a non-positive number
+    # crashes outright, so if there's no positive data at all, fall back to
+    # the ordinary linear axis below instead.
+    positive_vals = [v for v in qs + overlay_vals if v > 0]
+    if medians and medians.get("values") and positive_vals:
         ax.set_yscale("log")
-        positive_vals = [v for v in qs + overlay_vals if v > 0]
-        min_q = min(positive_vals) if positive_vals else 1
+        min_q = min(positive_vals)
+        max_q = max(positive_vals)
         ax.set_ylim(ymin=min_q / GRAPH_TOP_BUFFER, ymax=max_q * GRAPH_TOP_BUFFER)
 
         # matplotlib's default log-axis ticks are sparse and use scientific
@@ -386,7 +394,12 @@ def get_usgs_gages(gages: list, outpath: str, verbose: bool = False) -> None:
                     time_part = timestamp.split("T")[1].split("-")[0].split(".")[0]
                     out.write(f"{value},{date},{time_part}\n")
 
-                    if util.is_float(value):
+                    # -999999 is USGS's own "no data" sentinel (seen paired
+                    # with a "Ssn" qualifier on seasonally-operated gages);
+                    # it's a valid float so util.is_float() alone won't
+                    # catch it, and left in it wrecks both the y-axis scale
+                    # and the log-scale math below.
+                    if util.is_float(value) and float(value) != USGS_MISSING_VALUE:
                         raw_qs.append(float(value))
                         raw_tss.append(dt.strptime(f"{date}T{time_part}", date_f))
 
