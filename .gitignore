@@ -8,5 +8,7 @@ logs/*
 app/static/*.cfs
 app/static/*.gif
 app/static/*.png
+usgs_medians.json
+app/static/usgs_medians.json
 .vscode
 .env

@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import pytz
+import json
 import math
 import requests
 from bs4 import BeautifulSoup
@@ -36,6 +37,13 @@ USGS_CODE = {
 }
 
 TIMEOUT = 30  # timeout for get requests, in seconds
+
+MEDIAN_CACHE_FILE = "usgs_medians.json"
+MEDIAN_CACHE_MAX_AGE = timedelta(days=7)
+# Confirmed live: the stat service hard-caps requests at 10 site numbers
+# ("the number of siteNo elements input by the user exceeds the maximum
+# limit for this web service [max=[10]]" on an 11-site request).
+MEDIAN_CHUNK_SIZE = 10
 
 # Some upstream sites block the default python-requests User-Agent, so
 # identify as a browser on every request.
@@ -160,7 +168,7 @@ def get_dwr_graph(gage: gageman.Gage, outpath: str, verbose=False):
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
-def make_graph(raw_qs, raw_tss, outpath, gage):
+def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
     """
     Make a hydro graph and save it
 
@@ -168,6 +176,8 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     @param {list of Datetime} raw_tss - time stamps for readings
     @param {str} outpath - the static dir
     @param {gageman.Gage} gage - the gage the graph is for
+    @param {dict | None} medians - optional {"years": int, "values": {"M-D":
+        float}} historical daily-median overlay (USGS cfs gages only)
     """
     # only show last PLOT_DAYS days and drop other dirty data
     qs = []
@@ -197,10 +207,42 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     if len(qs) == 0 or len(tss) == 0:
         print(f"No data to plot for {gage}")
 
-    ax.plot(tss, qs)
+    ax.plot(tss, qs, label="Discharge")
+
+    overlay_vals = []
+    if medians and medians.get("values") and len(tss) > 0:
+        values = medians["values"]
+        overlay_dates = []
+        day = tss[0].date()
+        last_day = tss[-1].date()
+        while day <= last_day:
+            key = f"{day.month}-{day.day}"
+            if key in values:
+                # match type with tss (datetime, not date) so both series
+                # share the same x-axis unit conversion
+                overlay_dates.append(dt.combine(day, dt.min.time()))
+                overlay_vals.append(values[key])
+            day += timedelta(days=1)
+
+        if overlay_dates:
+            ax.plot(
+                overlay_dates,
+                overlay_vals,
+                marker="^",
+                markersize=6,
+                markerfacecolor="none",
+                markeredgecolor="#333333",
+                markeredgewidth=1.2,
+                linestyle="none",
+                zorder=3,
+                label=f"Median daily statistic ({medians['years']} years)",
+            )
+            ax.legend(loc="best", fontsize="small")
 
     # Setting ymax to 0 throws a warning, use 1 instead
     max_q = max(qs) if len(qs) > 0 else 1
+    if overlay_vals:
+        max_q = max(max_q, max(overlay_vals))
     ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
     plt.grid(visible=True)
@@ -266,6 +308,18 @@ def get_usgs_gages(gages: list, outpath: str, verbose: bool = False) -> None:
         code = ts["variable"]["variableCode"][0]["value"]
         lookup[(site, code)] = ts["values"][0]["value"]
 
+    # Historical daily-median overlay data (cfs gages only); cached on disk,
+    # so this is a no-op most runs. Isolated in its own try/except so any
+    # unexpected failure here can never take down the primary USGS batch
+    # (verbose mode otherwise lets exceptions from this function propagate).
+    try:
+        medians_lookup = _load_usgs_medians(gages, outpath, verbose=verbose)
+    except Exception as e:
+        click.echo(
+            f"\tWARNING: failed to load USGS medians, continuing without overlay: {e}", err=True
+        )
+        medians_lookup = {}
+
     date_f = "%Y-%m-%dT%H:%M:%S"
 
     # Per-gage error isolation: one gage missing/malformed from the batch
@@ -303,12 +357,143 @@ def get_usgs_gages(gages: list, outpath: str, verbose: bool = False) -> None:
                         raw_tss.append(dt.strptime(f"{date}T{time_part}", date_f))
 
             # --- Plot and save the hydrograph
-            make_graph(raw_qs, raw_tss, outpath, gage)
+            gage_medians = medians_lookup.get(site_id) if gage.units == "cfs" else None
+            make_graph(raw_qs, raw_tss, outpath, gage, medians=gage_medians)
         except Exception as e:
             click.echo(f"\tError processing USGS gage {gage.gage_id} from batch: {e}", err=True)
             if verbose:
                 traceback.print_exc()
             continue
+
+
+def _load_usgs_medians(gages: list, outpath: str, verbose: bool = False) -> dict:
+    """
+    Load (or refresh) cached long-term daily median discharge statistics for
+    USGS cfs gages, for use as a historical-reference overlay on their
+    hydrographs.
+
+    USGS only computes long-term daily statistics for discharge (parameterCd
+    00060), not stage/gage-height, so this intentionally only covers the
+    subset of USGS gages with units == "cfs" -- feet-unit gages are filtered
+    out here, not just left to return empty by the API.
+
+    This data represents decades of record and does not meaningfully change
+    day-to-day, so it is cached to disk in outpath and only refreshed every
+    MEDIAN_CACHE_MAX_AGE; most cron runs do zero network calls for this.
+
+    @param gages - list of gageman.Gage, any gage_type/units mix (non-USGS
+        and non-cfs gages are filtered out internally)
+    @param outpath - static dir to read/write the cache file
+    @param verbose - print debug text if True
+    @returns {site_id (str): {"years": int, "values": {"M-D": float}}}
+             keyed only by sites that actually have long-term record data
+    """
+    cfs_gages = [g for g in gages if g.gage_type == "USGS" and g.units == "cfs"]
+    if not cfs_gages:
+        return {}
+
+    cache_file = os.path.join(outpath, MEDIAN_CACHE_FILE)
+    if os.path.exists(cache_file):
+        age = dt.now() - dt.fromtimestamp(os.path.getmtime(cache_file))
+        if age < MEDIAN_CACHE_MAX_AGE:
+            try:
+                with open(cache_file, "rt") as f:
+                    cached = json.load(f)
+                if verbose:
+                    print(f"\tUsing cached USGS medians ({cache_file}, age {age})")
+                return cached
+            except (ValueError, OSError) as e:
+                click.echo(
+                    f"\tWARNING: could not read median cache {cache_file}: {e}, refetching",
+                    err=True,
+                )
+        elif verbose:
+            print(f"\tUSGS median cache is stale (age {age}), refreshing")
+
+    # str() required: gages.yaml parses some numeric gage_ids (e.g.
+    # 13181000) as Python int -- same gotcha as get_usgs_gages.
+    site_ids = [str(g.gage_id) for g in cfs_gages]
+
+    medians: dict = {}
+    for i in range(0, len(site_ids), MEDIAN_CHUNK_SIZE):
+        chunk = site_ids[i : i + MEDIAN_CHUNK_SIZE]
+        if i > 0:
+            time.sleep(LONG_SLEEP)
+
+        url = (
+            "https://waterservices.usgs.gov/nwis/stat/?sites="
+            + ",".join(chunk)
+            + "&statReportType=daily&statTypeCd=median&parameterCd=00060&format=rdb"
+        )
+        if verbose:
+            print(f"\tFetching USGS medians for {len(chunk)} sites")
+
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            if resp.status_code != 200:
+                click.echo(
+                    f"\tWARNING: bad response ({resp.status_code}) fetching USGS "
+                    f"medians for {chunk}, skipping this chunk",
+                    err=True,
+                )
+                continue
+            _parse_median_rdb(resp.text, medians)
+        except Exception as e:
+            click.echo(f"\tWARNING: error fetching USGS medians for {chunk}: {e}", err=True)
+            continue
+
+    # Only persist (and thus only start the 7-day clock) if we actually got
+    # something -- a transient total outage must not poison the cache with
+    # an empty result and silently disable the overlay for a week.
+    if medians:
+        try:
+            with open(cache_file, "wt") as f:
+                json.dump(medians, f)
+            if verbose:
+                print(f"\tWrote medians for {len(medians)} sites to {cache_file}")
+        except OSError as e:
+            click.echo(f"\tWARNING: could not write median cache {cache_file}: {e}", err=True)
+    else:
+        click.echo("\tWARNING: got zero USGS median data this run, not caching", err=True)
+
+    return medians
+
+
+def _parse_median_rdb(text: str, medians: dict) -> None:
+    """
+    Parse one RDB response from the USGS stat (daily median) service and
+    merge its rows into `medians` in place:
+      {site_id: {"years": int, "values": {"M-D": float}}}
+
+    Data rows are tab-delimited and start with literal "USGS"; everything
+    else (comments starting with '#', the header row, the field-type-code
+    row) is skipped by checking fields[0] == "USGS", regardless of exact
+    line count/order. Field order (0-indexed): agency_cd, site_no,
+    parameter_cd, ts_id, loc_web_ds, month_nu, day_nu, begin_yr, end_yr,
+    count_nu, p50_va.
+    """
+    for line in text.splitlines():
+        fields = line.split("\t")
+        if not fields or fields[0] != "USGS":
+            continue
+        try:
+            site_id = fields[1]
+            month_nu = int(fields[5])
+            day_nu = int(fields[6])
+            begin_yr = int(fields[7])
+            end_yr = int(fields[8])
+            p50_va = fields[10]
+        except (IndexError, ValueError):
+            continue
+        if not util.is_float(p50_va):
+            continue
+
+        entry = medians.setdefault(site_id, {"years": 0, "values": {}})
+        # begin_yr/end_yr vary slightly row-to-row for the same site (gaps
+        # in the record) -- use the longest span seen as the more
+        # representative "years of record" for this site's legend label.
+        entry["years"] = max(entry["years"], end_yr - begin_yr + 1)
+        entry["values"][f"{month_nu}-{day_nu}"] = float(p50_va)
 
 
 def get_nsv_gage(gage, outpath, verbose=False):
@@ -321,12 +506,12 @@ def get_nsv_gage(gage, outpath, verbose=False):
 
     # Proving grounds q - find average flow per hour
     pgq_g = gageman.get_gage("NSVBBRCO", "DWR")
-    pgq = pgq_g.series.groupby(pd.Grouper(freq="H")).mean()
+    pgq = pgq_g.series.groupby(pd.Grouper(freq=pd.Timedelta(hours=1))).mean()
 
     # Button rock dam af-ft
     braf_g = gageman.get_gage("BRKDAMCO", "DWR")
     # This probably doesn't need to be averaged, but doesn't really hurt either
-    braf = braf_g.series.groupby(pd.Grouper(freq="H")).mean()
+    braf = braf_g.series.groupby(pd.Grouper(freq=pd.Timedelta(hours=1))).mean()
 
     # Calculate approx inflow
     nsvq = braf.diff() * 12 + pgq
@@ -342,7 +527,7 @@ def get_nsv_gage(gage, outpath, verbose=False):
     with open(datafile, "wt") as f:
         date = nsvq.index[-1].strftime("%Y-%m-%d")
         time_part = nsvq.index[-1].strftime("%H:%M:%S")
-        f.write(f"{nsvq[-1]},{date},{time_part}\n")
+        f.write(f"{nsvq.iloc[-1]},{date},{time_part}\n")
 
 
 def get_foxton_gage(gage, outpath, verbose=False):
@@ -368,7 +553,7 @@ def get_foxton_gage(gage, outpath, verbose=False):
     with open(datafile, "wt") as f:
         date = foxton.index[-1].strftime("%Y-%m-%d")
         time_part = foxton.index[-1].strftime("%H:%M:%S")
-        f.write(f"{foxton[-1]},{date},{time_part}\n")
+        f.write(f"{foxton.iloc[-1]},{date},{time_part}\n")
 
 
 def get_wildcat_gage(gage, outpath, verbose=False):
@@ -394,7 +579,7 @@ def get_wildcat_gage(gage, outpath, verbose=False):
     with open(datafile, "wt") as f:
         date = wildcat.index[-1].strftime("%Y-%m-%d")
         time_part = wildcat.index[-1].strftime("%H:%M:%S")
-        f.write(f"{wildcat[-1]},{date},{time_part}\n")
+        f.write(f"{wildcat.iloc[-1]},{date},{time_part}\n")
 
 
 def get_prr_gage(gage, outpath, verbose=False):
