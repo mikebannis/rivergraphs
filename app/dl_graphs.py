@@ -5,7 +5,6 @@ import os
 import sys
 import time
 import pytz
-import shutil
 import math
 import requests
 from bs4 import BeautifulSoup
@@ -38,12 +37,17 @@ USGS_CODE = {
 
 TIMEOUT = 30  # timeout for get requests, in seconds
 
+# Some upstream sites block the default python-requests User-Agent, so
+# identify as a browser on every request.
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/120.0 Safari/537.36 riverproject.co"
+    )
+}
+
 
 class URLError(Exception):
-    pass
-
-
-class FailedImageAddr(Exception):
     pass
 
 
@@ -74,6 +78,7 @@ def get_wyseo_gage(gage, outpath, verbose=False):
     response = requests.post(
         "https://seoflow.wyo.gov/Data/DatasetGrid?dataset=4578",
         data=data,
+        headers=HEADERS,
         timeout=TIMEOUT,
     )
 
@@ -105,7 +110,7 @@ def get_wyseo_gage(gage, outpath, verbose=False):
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
-def get_dwr_graph(gage, outpath, verbose=False):
+def get_dwr_graph(gage: gageman.Gage, outpath: str, verbose=False):
     """
     Grabs default flow graph for Colorado DWR Gage 'gage'
 
@@ -114,6 +119,7 @@ def get_dwr_graph(gage, outpath, verbose=False):
     """
     response = requests.get(
         gage.data_url(),
+        headers=HEADERS,
         timeout=TIMEOUT,
     )
     if response.status_code == 404:
@@ -204,111 +210,105 @@ def make_graph(raw_qs, raw_tss, outpath, gage):
     plt.close()
 
 
-def get_usgs_gage(gage, outpath, verbose=False):
+def get_usgs_gages(gages: list, outpath: str, verbose: bool = False) -> None:
     """
-    Grabs default flow graph for USGS Gage 'gage' and write image to outfile.
+    Grabs flow data for a batch of USGS Gage objects in a single HTTP
+    request, then writes each gage's .cfs file and renders its hydrograph.
 
-    param: gage - gageman.Gage instance
-    prarm: outpath - path to output dir
+    USGS's legacy IV webservice discourages one-request-per-site use, so
+    this fetches every site + the union of parameter codes they need in one
+    call. Documented caps: 100 sites, 100 parameterCd values. URL builder:
+    https://waterservices.usgs.gov/rest/IV-Test-Tool.html
+
+    param: gages - list of gageman.Gage instances, all gage_type == "USGS"
+    param: outpath - path to output dir
     param: {bool} verbose - print debug text if True
     """
-    response = requests.get(gage.data_url(), timeout=TIMEOUT)
+    if not gages:
+        return
 
-    # Verify we got good stuff back
-    if response.status_code != 200:
-        raise URLError(response.status_code, response.text)
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    if gage.units == "cfs":
-        search = "Discharge, cubic feet per second"
-    elif gage.units == "feet":
-        search = "Gage height, feet"
-    else:
-        raise ValueError(
-            "Units for USGS gage must be cfs or feet. Received " f"{gage.units} for {gage}"
+    # USGS caps this request at 100 sites; warn loudly well before that so
+    # it's never discovered via silently-dropped sites in production.
+    if len(gages) > 90:
+        click.echo(
+            f"\tWARNING: {len(gages)} USGS gages in this batch, approaching "
+            "USGS's 100-site-per-request cap. Sites beyond the cap are "
+            "silently dropped from the response, not errored -- add "
+            "chunking before this reaches 100.",
+            err=True,
         )
 
-    if verbose:
-        print(f"\tlooking for {search}")
+    # str() is required: gages.yaml parses some unquoted numeric gage_ids
+    # (e.g. 13181000) as Python int, but the API's siteCode is always a
+    # string -- an int key here would silently make that gage unmatchable.
+    site_ids = [str(g.gage_id) for g in gages]
+    codes = sorted({USGS_CODE[g.units] for g in gages})
 
-    # Get the discharge
-    for tag in soup.find_all("a"):
-        if tag.get("name") == "gifno-99":
-            if tag.getText().strip() == search:
-                parent = tag.parent
-
-                # Grab the graph and save it
-                img = parent.parent.find_next("img")
-                if img.get("alt") == "Graph of ":
-                    img_addr = img.get("src")
-                else:
-                    raise FailedImageAddr(f"image address not found for {gage.gage_id}")
-                response = requests.get(
-                    img_addr,
-                    stream=True,
-                    cookies=response.cookies,
-                    timeout=TIMEOUT,
-                )
-
-                outfile = os.path.join(outpath, gage.image_file())
-                with open(outfile, "wb") as out:
-                    shutil.copyfileobj(response.raw, out)
-
-                # Grab the discharge and save it to a .cfs file
-                _next = parent.next_sibling
-                q = pull_val(_next)
-                if verbose:
-                    print(f'\tgot: {", ".join(q)} from website')
-                if not util.is_float(q):
-                    continue
-
-                q_outfile = os.path.join(outpath, gage.data_file())
-                with open(q_outfile, "wt") as out:
-                    for val in q:
-                        out.write(str(val) + ",")
-                    out.write("\n")
-
-    # Pull multiple values and write to file. URL builder at:
-    # https://waterservices.usgs.gov/rest/IV-Test-Tool.html
-    code = USGS_CODE[gage.units]
     url = (
-        f"https://waterservices.usgs.gov/nwis/iv/?sites={gage.gage_id}&"
-        f"parameterCd={code}&period=P{PLOT_DAYS}D&siteStatus=all&format=json"
+        f"https://waterservices.usgs.gov/nwis/iv/?sites={','.join(site_ids)}&"
+        f"parameterCd={','.join(codes)}&period=P{PLOT_DAYS}D&siteStatus=all&format=json"
     )
+    if verbose:
+        print(f"Getting batched USGS data for {len(gages)} gages (codes={codes})")
 
     resp = requests.get(
         url,
+        headers=HEADERS,
         timeout=TIMEOUT,
     )
     if resp.status_code != 200:
-        raise ValueError(f"Bad respone ({resp.status_code}) from {url}, got: " f'"{resp.text}"')
+        raise ValueError(f"Bad response ({resp.status_code}) from {url}, got: " f'"{resp.text}"')
 
-    results = resp.json()["value"]["timeSeries"][0]["values"][0]["value"]
-    if verbose:
-        print(f"\tGot {len(results)} results from API. Latest value is: {results[-1]}")
+    # Index by (site_id, parameter_code) -> list of {"value", "dateTime", ...}
+    lookup = {}
+    for ts in resp.json()["value"]["timeSeries"]:
+        site = ts["sourceInfo"]["siteCode"][0]["value"]
+        code = ts["variable"]["variableCode"][0]["value"]
+        lookup[(site, code)] = ts["values"][0]["value"]
 
-    outfile = os.path.join(outpath, gage.data_file())
-    with open(outfile, "wt") as out:
-        for result in results:
-            value = result["value"]
-            timestamp = result["dateTime"]
-            date = timestamp.split("T")[0]
-            time_part = timestamp.split("T")[1].split("-")[0].split(".")[0]
+    date_f = "%Y-%m-%dT%H:%M:%S"
 
-            data = f"{value},{date},{time_part}"
-            out.write(data + "\n")
+    # Per-gage error isolation: one gage missing/malformed from the batch
+    # response must not abort the rest. USGS silently omits unknown/offline
+    # sites from the response instead of erroring, so this is required, not
+    # just defensive.
+    for gage in gages:
+        try:
+            site_id = str(gage.gage_id)
+            code = USGS_CODE[gage.units]
+            results = lookup.get((site_id, code))
+            if not results:
+                click.echo(
+                    f"\tWARNING: no data for USGS {site_id} (param {code}) in batch, skipping",
+                    err=True,
+                )
+                continue
 
+            if verbose:
+                print(f"\tGot {len(results)} results for {site_id}. Latest: {results[-1]}")
 
-def pull_val(text):
-    """Pull gage values for USGS"""
-    fields = text.split()
-    for i in range(len(fields)):
-        if fields[i] == "value:":
-            try:
-                return (fields[i + 1], fields[i + 2], fields[i + 3])
-            except IndexError:
-                return ("N/A", "Gauge appears to be offline", "")
+            raw_qs = []
+            raw_tss = []
+            outfile = os.path.join(outpath, gage.data_file())
+            with open(outfile, "wt") as out:
+                for result in results:
+                    value = result["value"]
+                    timestamp = result["dateTime"]
+                    date = timestamp.split("T")[0]
+                    time_part = timestamp.split("T")[1].split("-")[0].split(".")[0]
+                    out.write(f"{value},{date},{time_part}\n")
+
+                    if util.is_float(value):
+                        raw_qs.append(float(value))
+                        raw_tss.append(dt.strptime(f"{date}T{time_part}", date_f))
+
+            # --- Plot and save the hydrograph
+            make_graph(raw_qs, raw_tss, outpath, gage)
+        except Exception as e:
+            click.echo(f"\tError processing USGS gage {gage.gage_id} from batch: {e}", err=True)
+            if verbose:
+                traceback.print_exc()
+            continue
 
 
 def get_nsv_gage(gage, outpath, verbose=False):
@@ -408,6 +408,7 @@ def get_prr_gage(gage, outpath, verbose=False):
     # TODO - look for urllib3.exceptions.NewConnectionError
     response = requests.get(
         gage.data_url(),
+        headers=HEADERS,
         timeout=TIMEOUT,
     )
 
@@ -487,35 +488,29 @@ def _process_gages(gages: list, outpath: str, verbose: bool) -> None:
         click.echo("No matching gages found!!!")
         sys.exit(1)
 
-    for i, gage in enumerate(gages):
+    usgs_gages = [g for g in gages if g.gage_type == "USGS"]
+    other_gages = [g for g in gages if g.gage_type != "USGS"]
+
+    # Batch-fetch USGS first so VIRTUAL gages below (which read already-
+    # on-disk USGS .cfs files) see freshly updated data from this run.
+    if usgs_gages:
+        if verbose:
+            click.echo(f"*** working on {len(usgs_gages)} USGS gages (batched)")
+            get_usgs_gages(usgs_gages, outpath, verbose=verbose)
+            click.echo("\tsuccess")
+        else:
+            try:
+                get_usgs_gages(usgs_gages, outpath, verbose=verbose)
+            except Exception as e:
+                click.echo(f"\tError getting batched USGS data: {e}", err=True)
+                traceback.print_exc()
+
+    for i, gage in enumerate(other_gages):
         if i > 0 and not verbose:
             time.sleep(LONG_SLEEP)
 
         if verbose:
             click.echo(f"*** working on {gage.gage_type} gage: {gage}")
-
-        # USGS is a little special, try twice for image
-        if gage.gage_type == "USGS":
-            try:
-                get_usgs_gage(gage, outpath, verbose=verbose)
-            except FailedImageAddr:
-                try:
-                    if verbose:
-                        click.echo("\tno image address, trying again...")
-                    time.sleep(LONG_SLEEP)
-                    get_usgs_gage(gage, outpath, verbose=verbose)
-                except FailedImageAddr:
-                    if verbose:
-                        click.echo("\tfailed to download gage, skipping")
-                    continue
-            except Exception as e:
-                click.echo(f"\tError getting gage {gage}: {e}")
-                traceback.print_exc()
-                continue
-
-            if verbose:
-                click.echo("\tsuccess")
-            continue
 
         # Determine gage getter function
         if gage.gage_type == "DWR":
