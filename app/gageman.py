@@ -113,12 +113,7 @@ class Gage:
 
     def image_file(self):
         """Return file name for gage image"""
-        if self.gage_type == "USGS":
-            img_file = f"{self.gage_id}.gif"
-        else:
-            img_file = f"{self.gage_id}.png"
-
-        return img_file
+        return f"{self.gage_id}.png"
 
     def data_file(self):
         """Return file name for gage data"""
