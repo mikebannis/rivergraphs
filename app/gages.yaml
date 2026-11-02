@@ -532,7 +532,43 @@
 - gage_id: 08263500
   type: USGS
   river: Rio Grande
-  location: Upper Taos
+  location: Upper Taos Box (Chiflo to Little Arsenic)
+  region: NM
+  units: cfs
+- gage_id: "08276500"
+  type: USGS
+  river: Rio Grande
+  location: Lower Taos Box / Racecourse
+  region: NM
+  units: cfs
+- gage_id: "08279000"
+  type: USGS
+  river: Rio Embudo
+  location: Dixon
+  region: NM
+  units: cfs
+- gage_id: "08265000"
+  type: USGS
+  river: Red River
+  location: Near Questa
+  region: NM
+  units: cfs
+- gage_id: "08285500"
+  type: USGS
+  river: Rio Chama
+  location: Below El Vado Dam
+  region: NM
+  units: cfs
+- gage_id: "08282300"
+  type: USGS
+  river: Rio Brazos
+  location: The Box (Corkins Lodge to Fishtail Rd)
+  region: NM
+  units: cfs
+- gage_id: "08378500"
+  type: USGS
+  river: Pecos River
+  location: Near Pecos
   region: NM
   units: cfs
 

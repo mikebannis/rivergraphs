@@ -115,6 +115,11 @@ def wyoming():
     return template_for_region("WY")
 
 
+@app.route("/new_mexico")
+def new_mexico():
+    return template_for_region("NM")
+
+
 def template_for_region(region):
     """
     Returned rendered flows template for all rivers in a region
