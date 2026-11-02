@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from datetime import timedelta
 from datetime import datetime as dt
 import matplotlib.dates as mdates
+import matplotlib.ticker as mticker
 from matplotlib import pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 from dotenv import load_dotenv
@@ -255,6 +256,26 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
         positive_vals = [v for v in qs + overlay_vals if v > 0]
         min_q = min(positive_vals) if positive_vals else 1
         ax.set_ylim(ymin=min_q / GRAPH_TOP_BUFFER, ymax=max_q * GRAPH_TOP_BUFFER)
+
+        # matplotlib's default log-axis ticks are sparse and use scientific
+        # notation (e.g. "6x10^2"). USGS's own graphs instead show plain,
+        # human-readable numbers with a gridline at each. Tick density
+        # adapts to how many decades the data spans, so a narrow range
+        # (e.g. 200-600) gets every 1-9 x 10^n (dense, still readable) while
+        # a wide range (e.g. 50-2000+) falls back to a coarser "nice number"
+        # set -- forcing full 1-9 density regardless of range overlaps
+        # labels (e.g. "90" and "100" on top of each other) on wide-range
+        # gages.
+        decades = math.log10(max_q / min_q) if min_q > 0 else 1
+        if decades <= 1.2:
+            subs = range(1, 10)
+        elif decades <= 2.5:
+            subs = (1, 2, 3, 5, 7)
+        else:
+            subs = (1, 2, 5)
+        ax.yaxis.set_major_locator(mticker.LogLocator(base=10, subs=subs))
+        ax.yaxis.set_minor_locator(mticker.NullLocator())
+        ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
     else:
         ax.set_ylim(ymin=0, ymax=max_q * GRAPH_TOP_BUFFER)
     ax.xaxis.set_major_formatter(fmt)
