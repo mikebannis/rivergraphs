@@ -171,6 +171,19 @@ def get_dwr_graph(gage: gageman.Gage, outpath: str, verbose=False):
     make_graph(raw_qs, raw_tss, outpath, gage)
 
 
+def _next_log_tick(value: float, subs) -> float:
+    """
+    Smallest "sub x 10^n" (n an integer, sub drawn from `subs`) that is
+    strictly greater than `value`. Used to guarantee a labeled gridline
+    always appears above the highest plotted point on a log-scaled graph,
+    rather than letting the peak land flush against the top edge.
+    """
+    exponent = math.floor(math.log10(value))
+    candidates = [s * (10**e) for e in (exponent, exponent + 1) for s in subs]
+    above = [c for c in candidates if c > value]
+    return min(above) if above else value * 1.1
+
+
 def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
     """
     Make a hydro graph and save it
@@ -263,7 +276,6 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
         ax.set_yscale("log")
         min_q = min(positive_vals)
         max_q = max(positive_vals)
-        ax.set_ylim(ymin=min_q / GRAPH_TOP_BUFFER, ymax=max_q * GRAPH_TOP_BUFFER)
 
         # matplotlib's default log-axis ticks are sparse and use scientific
         # notation (e.g. "6x10^2"). USGS's own graphs instead show plain,
@@ -281,6 +293,16 @@ def make_graph(raw_qs, raw_tss, outpath, gage, medians=None):
             subs = (1, 2, 3, 5, 7)
         else:
             subs = (1, 2, 5)
+
+        # Always leave a labeled gridline visible above the highest plotted
+        # point (discharge or median marker, whichever is taller) -- the
+        # flat GRAPH_TOP_BUFFER headroom alone doesn't guarantee the next
+        # "nice" tick actually falls within it, which left the peak flush
+        # against the top edge with nothing labeled above it.
+        top_tick = _next_log_tick(max_q, subs)
+        ymax = max(max_q, top_tick) * GRAPH_TOP_BUFFER
+        ax.set_ylim(ymin=min_q / GRAPH_TOP_BUFFER, ymax=ymax)
+
         ax.yaxis.set_major_locator(mticker.LogLocator(base=10, subs=subs))
         ax.yaxis.set_minor_locator(mticker.NullLocator())
         ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
